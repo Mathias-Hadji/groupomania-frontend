@@ -99,4 +99,8 @@ body{
   color: green;
 }
 
+textarea{
+  resize: none;
+}
+
 </style>

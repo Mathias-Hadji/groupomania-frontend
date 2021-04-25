@@ -21,7 +21,7 @@
         <li v-if="invalidInputEmail == true" class="text-danger">Email non valide</li>
         <li v-if="invalidInputPassword == true" class="text-danger">Mot de passe : requiert au minimum 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.</li>          
       </div>
-      <div id="container-error-submit-form-registration"></div>
+      <div id="container-error-submit-form-registration" ></div>
     </div>
 </template>
 <script>
@@ -31,10 +31,7 @@
 
 import axios from 'axios';
 export default {
-  name: 'Registration',
-  components: {
 
-  },
   data(){
     return {    
       firstName: '',
@@ -47,8 +44,8 @@ export default {
       invalidInputEmail: false,
       invalidInputPassword: false,
 
-      firstNameRegExp: new RegExp('^[a-z éèêëàâîïôöûü-]+$', 'i'),
-      lastNameRegExp: new RegExp('^[a-z éèêëàâîïôöûü-]+$','i'),
+      firstNameRegExp: new RegExp('^[a-zéèêëàâîïôöûü-]+$', 'i'),
+      lastNameRegExp: new RegExp('^[a-zéèêëàâîïôöûü-]+$','i'),
       emailRegExp: new RegExp('^[a-z0-9._-]+[@]{1}[a-z]+[.]{1}[a-z]{2,3}$','i'),
       passwordRegExp: new RegExp("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$", 'i'),
     }
@@ -63,54 +60,59 @@ export default {
     }, 
   },
   methods: {
+    uppercaseFirstLetter(string) 
+    {
+      return string.charAt(0).toUpperCase() + string.slice(1);
+    },
+
     switchToLogin(){
       this.$store.state.modeFromVueX = 'login'
+    },
+
+    isValid(regexp, wordToVerify){
+      if(regexp.test(wordToVerify) == false){
+        return false
+      } else {
+        return true
+      }
     },
 
     validFirstName(){
       if(this.firstNameRegExp.test(this.firstName) == false){
         this.invalidInputFirstName = true
-        return false
       } else {
         this.invalidInputFirstName = false
-        this.hasError = false
-        return true
       }
     },
     validLastName(){
       if(this.lastNameRegExp.test(this.lastName) == false){
         this.invalidInputLastName = true
-        return false
       } else {
         this.invalidInputLastName = false
-        return true
       }
     },    
     validEmail(){
       if(this.emailRegExp.test(this.email) == false){
         this.invalidInputEmail = true
-        return false
       } else {
         this.invalidInputEmail = false
-        return true
       }
     },
     validPassword(){
       if(this.passwordRegExp.test(this.password) == false){
         this.invalidInputPassword = true
-        return false
       } else {
         this.invalidInputPassword = false
-        return true
       }
     },
+
     createUserAccount(){
-      if(this.validFirstName() && this.validLastName() && this.validEmail() && this.validPassword()){
-        axios.post('http://localhost:3000/api/auth/registration', {
-          firstName: this.firstName.trim(),
-          lastName: this.lastName.trim(),
-          email: this.email.trim(),
-          password: this.password.trim()
+      if(this.isValid(this.firstNameRegExp, this.firstName) && this.isValid(this.lastNameRegExp, this.lastName) && this.isValid(this.emailRegExp, this.email) && this.isValid(this.passwordRegExp, this.password)){
+        axios.post('http://localhost:3000/api/user/registration', {
+          firstName: this.uppercaseFirstLetter(this.firstName.trim().toLowerCase()),
+          lastName: this.lastName.trim().toUpperCase(),
+          email: this.email.toLowerCase().trim(),
+          password: this.password
         })
         .then(response => {
           console.log(response),

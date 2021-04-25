@@ -14,7 +14,6 @@
     </div>
 
     <div id="container-error-submit-form-login"></div>
-
   </div>
 </template>
 
@@ -24,10 +23,7 @@
 
 import axios from 'axios';
 export default {
-  name: 'Login',
-  components: {
 
-  },
   data(){
     return {
       email: '',
@@ -48,9 +44,17 @@ export default {
     },
   },
   methods: {
+    setTokenFromLocalStorage(token){
+      localStorage.setItem('groupomania_token', JSON.stringify(token))
+    },
+    setUserIdFromLocalStorage(userId){
+      localStorage.setItem('groupomania_userId', JSON.stringify(userId))
+    },  
+    
     switchToCreateAccount(){
       this.$store.state.modeFromVueX = 'createAccount'
     },
+    
     validEmail(){
       if(this.emailRegExp.test(this.email) == false){
         return false
@@ -67,17 +71,23 @@ export default {
     },   
     login(){
       if(this.validEmail() && this.validPassword()){
-        axios.post('http://localhost:3000/api/auth/login', {
+        axios.post('http://localhost:3000/api/user/login', {
           email: this.email.trim(),
-          password: this.password.trim()
+          password: this.password
         })
         .then(response => {
-          console.log(response.data),
+          console.log(response.data)
           document.getElementById('container-error-submit-form-login').classList.remove('text-danger')
           document.getElementById('container-error-submit-form-login').classList.add('text-success')
           document.getElementById('container-error-submit-form-login').innerHTML = `<p>${response.data.message}</p>`
+
+          this.setTokenFromLocalStorage(response.data.token)
+          this.setUserIdFromLocalStorage(response.data.userId)
+          //this.$router.push('news');
+          window.location.href = 'news';
         })
         .catch(error => {
+          console.log(error.response.data)
           document.getElementById('container-error-submit-form-login').innerHTML = `<p>${error.response.data.error}</p>`
           document.getElementById('container-error-submit-form-login').classList.add('text-danger')
         })
