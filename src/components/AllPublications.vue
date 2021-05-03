@@ -97,13 +97,14 @@ export default {
 
 .publication {
     max-width: 100%;
-    width: 800px;
+    width: 900px;
     background:white;
     border-radius: 16px;
     padding:30px 10px;
     margin-top: 25px;
     margin-bottom: 25px;
     display: flex;
+
 
     .profile-pic-section{
         width: 10%;

@@ -11,7 +11,6 @@
 import CreateNewPublication from '@/components/CreateNewPublication.vue'
 import AllPublications from '@/components/AllPublications.vue'
 
-
 export default {
     name: 'News',
     components: {
@@ -25,9 +24,7 @@ export default {
 .news{
     display: flex;
     flex-direction: column;
-
     align-items: center;
-    height: 600px;
 }
 
 </style>

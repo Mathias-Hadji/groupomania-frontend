@@ -83,7 +83,6 @@ export default {
 
           this.setTokenFromLocalStorage(response.data.token)
           this.setUserIdFromLocalStorage(response.data.userId)
-          //this.$router.push('news');
           window.location.href = 'news';
         })
         .catch(error => {

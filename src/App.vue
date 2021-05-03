@@ -4,12 +4,12 @@
       <img id="logo" alt="logo" src="./assets/logo.svg">
     </div>
     <div>
-      <router-link to="/">Accueil</router-link> |
-      <router-link to="/about">A propos</router-link>
+      <router-link to="/">Accueil</router-link>
     </div>
   </div>
   <router-view/>
 </template>
+
 
 
 
@@ -68,6 +68,28 @@ body{
   transition: .4s background-color;
 }
 
+.button-primary{
+  background: #2196F3;
+}
+
+.button-primary:hover{
+  background: #1976D2;  
+}
+
+.button-success{
+  background: rgb(126, 179, 74);
+}
+
+
+.button-danger{
+  background: rgb(187, 37, 37);
+}
+
+.button-danger:hover{
+  background: rgb(212, 0, 0);
+}
+
+
 .button:hover {
   cursor:pointer;
   background: #1976D2;
@@ -101,6 +123,10 @@ body{
 
 textarea{
   resize: none;
+}
+
+.dispflex{
+  display: flex;
 }
 
 </style>

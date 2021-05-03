@@ -109,7 +109,7 @@ export default {
 
 .card {
     max-width: 100%;
-    width: 800px;
+    width: 900px;
     background:white;
     border-radius: 16px;
     padding:30px 20px;
