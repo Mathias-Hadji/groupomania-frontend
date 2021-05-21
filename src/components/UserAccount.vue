@@ -1,12 +1,12 @@
 <template>
     <div class="card">
-        <div>
-            <h1 class="card__title">{{ userData.last_name_user + ' ' + userData.first_name_user }}</h1>
+        <div class="name-user">
+            <h1 class="name-user__title">{{ firstNameUser }} {{ lastNameUser }}</h1>
         </div>
         <div class="row">
             <div class="div-profile-pic">
                 <h2 class="div-profile-pic__title">Photo de profil</h2>
-                <img v-if="imageTempUrl == null" class="div-profile-pic__pic" :src="userData.profile_pic_user" alt="" width="150">
+                <img v-if="imageTempUrl == null" class="div-profile-pic__pic" :src="profilePicUser" alt="">
                 <img v-else :src="imageTempUrl" class="div-profile-pic__pic" width="150"> 
                 <label v-if="validBtnProfilePic == false" class="div-profile-pic__label" for="profilePic">Modifier</label>
                 <input @change="previewImage" id="profilePic" class="div-profile-pic__input" type="file" name="profilePic">
@@ -21,12 +21,12 @@
             <div class="div-user-information">
                 <div div class="under-div-user-information">
                     <h2 class="under-div-user-information__title">Email</h2>
-                    <p>{{ userData.email_user }}</p>
+                    <p>{{ userEmail }}</p>
                 </div> 
                 <div class="under-div-user-description">
                     <h2 class="under-div-user-description__title">Description</h2>
-                    <p class="under-div-user-description__description">{{ userData.description_user }}</p>
-                    <textarea v-model="userDescription" class="under-div-user-description__message-input" rows="5" maxlength="255" placeholder="Ajouter un texte ..."></textarea>
+                    <p class="under-div-user-description__description">{{ userDescription }}</p>
+                    <textarea v-model="inputUserDescription" class="under-div-user-description__message-input" rows="5" maxlength="255" placeholder="Ajouter un texte ..."></textarea>
                     <button @click="modifyUserDescription" class="button">Modifier ma description</button>
                     <p v-if="successMsgDescription != null" class="under-div-user-description__success-message text-success">{{ successMsgDescription }}</p> 
                     <p v-if="errorMsgDescription != null" class="under-div-user-description__error-message text-danger">{{ errorMsgDescription }}</p>   
@@ -41,13 +41,14 @@
                 <h2 class="div-update-password__title">Modifier mon mot de passe</h2>
                 <div class="div-password">
                     <label class="div-password__label" for="current-password">Mot de passe actuel :</label>
-                    <input v-model="userCurrentPassword" class="div-password__input" type="password" name="current-password" required>
+                    <input v-model="inputUserCurrentPassword" class="div-password__input" type="password" name="current-password" required>
                     <p v-if="errorMsgCurrentPassword != null" class="div-password__error-message text-danger">{{ errorMsgCurrentPassword }}</p>
                 </div>
                 <div class="div-password">
                     <label class="div-password__label" for="new-password">Nouveau mot de passe :</label>
-                    <input v-model="userNewPassword" class="div-password__input" type="password" name="new-password" required>
+                    <input v-model="inputUserNewPassword" class="div-password__input" type="password" name="new-password" required>
                     <p v-if="errorMsgNewPassword != null" class="div-password__error-message text-danger">{{ errorMsgNewPassword }}</p>
+                    
                     <button @click="modifyPassword" v-bind:disabled="btnDisabled == true" v-bind:class="{'button--disabled' : btnDisabled}" class="button">Valider</button>
                     <p v-if="successMsgPassword != null" class="div-password__success-message text-success">{{ successMsgPassword }}</p>
                 </div>
@@ -68,9 +69,19 @@ export default {
         return{
 
             userData:'',
-            userDescription: '',
-            userCurrentPassword: '',
-            userNewPassword: '',
+
+            firstNameUser: '',
+            lastNameUser: '',
+
+            userEmail: '',
+
+            inputUserDescription: '',
+            userDescription:'',
+
+            inputUserCurrentPassword: '',
+            inputUserNewPassword: '',
+
+            profilePicUser: '',
             selectedFile: null,
             imageTempUrl: null,
             validBtnProfilePic: false,
@@ -87,9 +98,9 @@ export default {
 
             successMsgProfilePic: null,
             errorMsgProfilePic: null,
-
         }
     },
+    
 
     mounted(){
         axios.get(`http://localhost:3000/api/user/${this.getUserIdFromLocalStorage()}`,{
@@ -98,13 +109,22 @@ export default {
         .then(res => {
 
             this.userData = res.data.result[0]
+
+            this.profilePicUser = this.userData.profile_pic_user
+
+            this.firstNameUser = this.userData.first_name_user
+            this.lastNameUser = this.userData.last_name_user
+
+            this.userEmail = this.userData.email_user
+            this.userDescription = this.userData.description_user
         })
         .catch(error => console.log(error.response))
     },
 
     computed:{
+        
         btnDisabled(){
-            if(this.userCurrentPassword != '' && this.userNewPassword != ''){
+            if(this.inputUserCurrentPassword.length > 0 && this.inputUserNewPassword.length > 0){
                 return false;
             } else {
                 return true;
@@ -140,17 +160,27 @@ export default {
             formData.append('userId', this.getUserIdFromLocalStorage());
             formData.append('image', this.selectedFile);
 
-            axios.put(`http://localhost:3000/api/user/profile-pic/${this.getUserIdFromLocalStorage()}`, formData, {
-                headers: {
+            axios.put(`http://localhost:3000/api/user/profile-pic/${this.getUserIdFromLocalStorage()}`, 
+            formData, 
+            { headers: {
                     Authorization: `Bearer ${this.getTokenFromLocalStorage()}`,
                     'Content-Type': 'multipart/form-data',
                 }
             })
             .then(response => {
-                console.log(response)
+
                 this.errorMsgProfilePic = null;
                 this.successMsgProfilePic = response.data.message;
-                this.reloadPage()
+
+                axios.get(`http://localhost:3000/api/user/${this.getUserIdFromLocalStorage()}`,{
+                    headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage() }`}
+                })
+                .then(response => {
+
+                    this.profilePicUser = response.data.result[0].profile_pic_user
+                })
+                .catch(error => console.log(error.response))
+
             })
             .catch(error => {
                 console.log(error)
@@ -165,14 +195,23 @@ export default {
 
         modifyUserDescription(){
             axios.put(`http://localhost:3000/api/user/description/${this.getUserIdFromLocalStorage()}`, 
-            { userDescription: this.userDescription },
+            { inputUserDescription: this.inputUserDescription },
             {
                 headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage() }`}            
             })
             .then(res => {
-                console.log(res)
                 this.errorMsgDescription = null;
                 this.successMsgDescription = res.data.message;
+
+                axios.get(`http://localhost:3000/api/user/${this.getUserIdFromLocalStorage()}`,{
+                    headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage() }`}
+                })
+                .then(res => {
+
+                    this.userDescription = res.data.result[0].description_user
+                })
+                .catch(error => console.log(error.response))
+
             })
             .catch(err => {
                 console.log(err)
@@ -181,20 +220,24 @@ export default {
         },
 
         modifyPassword(){
-            console.log(this.userCurrentPassword)
+
             axios.put(`http://localhost:3000/api/user/password/${this.getUserIdFromLocalStorage()}`, 
-            { userCurrentPassword: this.userCurrentPassword, userNewPassword: this.userNewPassword},
+            { inputUserCurrentPassword: this.inputUserCurrentPassword, inputUserNewPassword: this.inputUserNewPassword},
             { headers: { 
                 Authorization: `Bearer ${this.getTokenFromLocalStorage() }`}})
             .then(res => {
                 this.errorMsgCurrentPassword = null;
                 this.errorMsgNewPassword = null;
                 this.successMsgPassword = res.data.message;
+                this.inputUserCurrentPassword = ''
+                this.inputUserNewPassword = ''
             })
             .catch(err => {
                 console.log(err.response);
-                this.errorMsgCurrentPassword = err.response.data.notMatch;
+                this.errorMsgCurrentPassword = err.response.data.notValid;
                 this.errorMsgNewPassword = err.response.data.notValid;
+                this.inputUserCurrentPassword = ''
+                this.inputUserNewPassword = ''
             })
 
         },
@@ -212,7 +255,7 @@ export default {
                 })
                 .catch(err => console.log(err))
             } else {
-                alert('Suppression du compte annulée.')
+                alert('Suppression de votre compte annulée.')
             }
         },
 
@@ -245,6 +288,12 @@ export default {
     margin-top: 50px;
     margin-bottom: 50px;
 
+    .name-user{
+        display: flex;
+        width: 100%;
+        justify-content: center;
+        align-items: center;
+    }
 
 
     .row{
@@ -267,7 +316,6 @@ export default {
             }
 
             &__pic{
-                width: 80%;
                 margin-bottom: 20px;
                 border-radius:50%;
                 width:200px;

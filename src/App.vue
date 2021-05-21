@@ -1,13 +1,13 @@
 <template>
-  <div id="nav">
-    <div>
-      <img id="logo" alt="logo" src="./assets/logo.svg">
+    <div id="nav">
+        <div>
+            <img id="logo" alt="logo" src="./assets/logo.svg">
+        </div>
+        <div>
+            <router-link to="/">Accueil</router-link>
+        </div>
     </div>
-    <div>
-      <router-link to="/">Accueil</router-link>
-    </div>
-  </div>
-  <router-view/>
+    <router-view/>
 </template>
 
 
@@ -16,117 +16,144 @@
 <style lang="scss">
 
 *{
-  margin:0;
-  padding: 0;
-  box-sizing: border-box;
+    margin:0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+    font-family: Avenir, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: #2c3e50;
 }
 
 body{
-  background-image: linear-gradient(62deg, #7e91fb 0%, #6876f7 100%);
-  min-height: 100vh;
+    background-image: linear-gradient(62deg, #7e91fb 0%, #6876f7 100%);
+    min-height: 100vh;
 }
 
 #nav {
-  padding: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  background: #fff;
+    padding: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    background: #fff;
 
-  #logo {
-    height: 30px;
-  }
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-    text-decoration: none;
-
-    &.router-link-exact-active {
-      color: #2196F3;
+    #logo {
+        height: 30px;
     }
-  }
+
+    a {
+        font-weight: bold;
+        color: #2c3e50;
+        text-decoration: none;
+
+        &.router-link-exact-active {
+        color: #2196F3;
+        }
+    }
 }
 
 .button {
-  background: #2196F3;
-  color:white;
-  border-radius: 8px;
-  font-weight: 800;
-  font-size: 15px;
-  border: none;
-  width: 100%;
-  padding: 16px;
-  transition: .4s background-color;
+    background: #2196F3;
+    color:white;
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 15px;
+    border: none;
+    width: 100%;
+    padding: 16px;
+    transition: .4s background-color;
 }
 
 .button-primary{
-  background: #2196F3;
+    background: #2196F3;
 }
 
 .button-primary:hover{
-  background: #1976D2;  
+    background: #1976D2;  
 }
 
 .button-success{
-  background: rgb(126, 179, 74);
+    background: rgb(126, 179, 74);
 }
 
 
 .button-danger{
-  background: rgb(187, 37, 37);
+    background: rgb(187, 37, 37);
 }
 
 .button-danger:hover{
-  background: rgb(212, 0, 0);
+    background: rgb(212, 0, 0);
 }
 
 
 .button:hover {
-  cursor:pointer;
-  background: #1976D2;
+    cursor:pointer;
+    background: #1976D2;
 }
 
 .button--disabled {
-  background:#cecece;
-  color:#ececec;
+    background:#cecece;
+    color:#ececec;
 }
 
 .button--disabled:hover {
-  cursor:not-allowed;
-  background:#cecece;
+    cursor:not-allowed;
+    background:#cecece;
+}
+
+.input{
+    padding: 8px;
+    border: none;
+    border-radius: 9px;
+    background: #f2f2f2;
+    font-weight: 500;
+    font-size: 16px;
+    flex: 1;
+    min-width: 100px;
 }
 
 .error-input{
-  border: 1px solid red;
+    padding: 8px;
+    border: 1px solid red;
+    border-radius: 9px;
+    background: #f2f2f2;
+    font-weight: 500;
+    font-size: 16px;
+    flex: 1;
+    min-width: 100px;
 }
 
 .valid-input{
-  border: 1px solid green;
+    padding: 8px;
+    border: 1px solid green;
+    border-radius: 9px;
+    background: #f2f2f2;
+    font-weight: 500;
+    font-size: 16px;
+    flex: 1;
+    min-width: 100px;
 }
 
 .text-danger{
-  color: red;
+    color: red;
 }
 
 .text-success{
-  color: green;
+    color: green;
 }
 
 textarea{
-  resize: none;
+    resize: none;
 }
 
 .dispflex{
-  display: flex;
+    display: flex;
 }
+
+
+
 
 </style>
