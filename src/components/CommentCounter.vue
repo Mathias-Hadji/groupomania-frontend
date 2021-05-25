@@ -1,83 +1,44 @@
 <template>
-    <div class="commentary-section">
-        <h2>Commentaires</h2>
-
-        <div :key="index" v-for="(comment, index) in commentsPublication" class="publication-list-commentary-container">
-            <div class=profile-pic-section>
-                <img class="profile-pic-section__author-pic" src="">
-            </div>
-            <div class="user-commentary-container">
-                <div class="commentary-info">
-                    <p class="commentary-info__author-name">{{  }} {{  }}</p>
-                    <p class="commentary-info__date"></p>
-                    <p class="commentary-info__delete" @click="deleteOneComment(commentaire.id)">X</p>  
-                </div> 
-                <div class="message-user-commentary">
-                    <p>{{ comment.comment }}</p>
-                </div>
-            </div>
-        </div>
-        <div class="new-commentary-container">
-            <div class=profile-pic-section>
-                <img class="profile-pic-section__author-pic" src="">
-            </div>
-            <div class="new-commentary">
-                <textarea v-model="addNewComment" class="new-commentary__input-text" name="" placeholder="Ecrivez un commentaire..."></textarea><span><button @click="publishNewComment(publication)" class="button">Publier</button></span>
-            </div>
-        </div>
+    <div v-if="comments.length < 2" class="commitment-section-row">
+        <img class="commitment-section-row__icon" src="../assets/comment-solid.svg"><span>{{ comments.length }} commentaire</span>
     </div>
+    <div v-else class="commitment-section-row">
+        <img class="commitment-section-row__icon" src="../assets/comment-solid.svg"><span>{{ comments.length }} commentaires</span>
+    </div>
+
+
 </template>
 
 <script>
-import axios from 'axios';
-
 
 export default {
+
+    props: {
+        publicationId: Number,
+        comments: Array,
+    },
+
+    computed: {
+
+
+    },
+
     data(){
         return {
-            commentsPublication: '',
-            messages: '',
 
-            addNewComment: '',
         }
     },
 
     mounted(){
 
-        // Get publications
-        axios.get('http://localhost:3000/api/comment-publication/505',{
-            headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage()}` }
-        })
-        .then(res => {
-            this.commentsPublication = res.data
-        }) 
-        .catch(error => {
-            console.log(error.response);
-        })
     },
-
 
 
     methods:{
 
-        deleteOneComment(commentId){
-
-            axios.delete(`http://localhost:3000/api/publication/comment/${commentId}`, 
-            { headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage()}`}})
-            .then(res => {
-                console.log(res)
-            })
-            .catch(err => {
-                console.log(err.response);
-            })
-        },
 
         replaceSymbol(message){
             return message.split('&apos;').join("'")
-        },
-
-        reloadPage(){
-            window.location.reload()
         },
 
         getTokenFromLocalStorage(){
@@ -90,28 +51,7 @@ export default {
 
         getPublicationsLikedFromLocalStorage(){
             return JSON.parse(localStorage.getItem('groupomania_publicationsLiked'))
-        },
-
-
-
-        deletePublication(publicationId){
-            const confirmMsgDeleteAccount = confirm('Attention, cette action est irreversible. Etes-vous sûr de vouloir supprimer votre publication ?')
-
-            if(confirmMsgDeleteAccount == true){
-                axios.delete(`http://localhost:3000/api/publication/${publicationId}`, {
-                    headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage()}` }
-                })
-                .then(response => {
-                    console.log(response);
-                    this.reloadPage()
-                })
-                .catch(error => {
-                    console.log(error.response);
-                })
-            } else{
-                alert('Suppression de la publication annulée.')               
-            }
-        },       
+        },      
     },
 
 }

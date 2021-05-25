@@ -1,7 +1,7 @@
 <template>
     <div class="card">
     <h2 class="card__title">Exprimez-vous :</h2>
-    <form class="form-publication" @submit.prevent="sendPublication" enctype="multipart/form-data">
+    <form class="form-publication" @submit.prevent="createNewPublication" enctype="multipart/form-data">
         <div v-if="imageTempUrl != null " @click="cancelPrevImage" class="div-image-preview">
             <img :src="imageTempUrl" class="div-image-preview__image-preview" alt="Médias">       
         </div>            
@@ -36,6 +36,36 @@ export default {
     },
     methods:{
 
+        createNewPublication(){
+            let formData = new FormData()
+            formData.append('userId', this.getUserIdFromLocalStorage());
+            formData.append('message', this.replaceSymbol(this.message));
+            formData.append('image', this.selectedFile);
+
+            axios.post('http://localhost:3000/api/publication', formData, {
+                headers: {
+                    Authorization: `Bearer ${this.getTokenFromLocalStorage()}`,
+                    'Content-Type': 'multipart/form-data',
+                }
+            })
+            .then(response => {
+                console.log(response)
+                this.message = ''
+
+                // Get publications
+                axios.get('http://localhost:3000/api/publication',{
+                    headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage()}` }
+                })
+                .then(response => {
+                    console.log(response)
+                    this.$emit('event-update-publications', { publications: response.data})
+                }) 
+                .catch(error => {
+                    console.log(error.response);
+                })
+            })
+            .catch(error => console.log(error));
+        },
 
         previewImage(event) {
             this.selectedFile = event.target.files[0]
@@ -62,11 +92,6 @@ export default {
         },
 
 
-
-
-
-
-
         replaceSymbol(message){ 
             return message.split("'").join('&apos;')
         },
@@ -81,25 +106,6 @@ export default {
 
         getUserIdFromLocalStorage(){
             return JSON.parse(localStorage.getItem('groupomania_userId'))
-        },
-        
-        sendPublication(){
-            let formData = new FormData()
-            formData.append('userId', this.getUserIdFromLocalStorage());
-            formData.append('message', this.replaceSymbol(this.message));
-            formData.append('image', this.selectedFile);
-
-            axios.post('http://localhost:3000/api/publication', formData, {
-                headers: {
-                    Authorization: `Bearer ${this.getTokenFromLocalStorage()}`,
-                    'Content-Type': 'multipart/form-data',
-                }
-            })
-            .then(response => {
-                console.log(response)
-                this.reloadPage()
-            })
-            .catch(error => console.log(error));
         },
     }   
 }

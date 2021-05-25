@@ -1,73 +1,17 @@
 <template>
-
-    <div class="container-publications">
-
-        <div class="publication">
-            <div class="container-publication">
-            
-                <div class="header-publication">
-                    <div class=profile-pic-section>
-                        <img class="profile-pic-section__author-pic" :src="publication.profile_pic_user">
-                    </div>
-                    <div class="publication-info">
-                        <p class="publication-info__author-name"> {{ publication.first_name_user }} {{ publication.last_name_user }}</p>
-                        <p class="publication-info__date">{{ publication.date_publication_fr }}</p>
-                        <p v-if="getUserIdFromLocalStorage() == publication.user_id_publication" class="publication-info__delete" @click="deletePublication()">X</p>     
-                    </div>          
-                </div> 
-
-                <div class="content-section">
-                    <div class="publication-text">
-                        <p class="publication-text__message">{{ publication.message_publication }}</p>
-                    </div>
-
-                    <div class="publication-file">
-                        <img v-if="publication.image_publication != ''" class="publication-file__image" :src="publication.image_publication">
-                    </div>
-                </div>
-
-                <div class="commitment-section">
-                    <LikePublication 
-                        v-bind:publicationId = publicationId 
-                    />
-
-
-                    <CommentCounter 
-                        v-bind:publicationId = publicationId
-                        v-bind:comments = comments
-                    />
-
-                    <div class="commitment-section-row">
-                        <img class="commitment-section-row__icon" src="../assets/share-solid.svg"><span>PARTAGER</span>
-                    </div>
-                </div>
-                <hr>
-                <CommentPublication 
-                    @event-update-comments="updateComments"
-                    v-bind:publicationId = publicationId
-                    v-bind:comments = comments
-                />
-            </div>
-        </div>
+    <div v-if="getPublicationsLikedFromLocalStorage() && getPublicationsLikedFromLocalStorage().includes(publicationId)" class="commitment-section-row">
+        <img @click="onLikePublication()" class="commitment-section-row__icon" src="../assets/heart-solid.svg"><span>{{ likes.length }}</span> 
+    </div>
+    <div v-else class="commitment-section-row">
+        <img @click="onLikePublication()" class="commitment-section-row__icon" src="../assets/heart-regular.svg"><span>{{ likes.length }}</span> 
     </div>
 </template>
 
 <script>
 import axios from 'axios';
 
-import LikePublication from '@/components/LikePublication.vue'
-import CommentCounter from '@/components/CommentCounter.vue'
-import CommentPublication from '@/components/CommentPublication.vue'
 
 export default {
-
-    name: 'Publication',
-
-    components: {
-        LikePublication,
-        CommentCounter,
-        CommentPublication,
-    },
 
     props: {
         publicationId: Number,
@@ -75,81 +19,144 @@ export default {
 
     data(){
         return {
-            publication: [],
-            comments: [],
+            likes: [],
+            arrayPublicationLikedByUser: [],
         }
     },
 
     mounted(){
-        this.getOnePublication()
-        this.getCommentsOfOnePublication()
+
+        this.getLikesOfOnePublication()
+        this.getPublicationsLikedByOneUser()
     },
 
 
 
     methods:{
 
-        getOnePublication(){
+        getLikesOfOnePublication(){
 
-            axios.get(`http://localhost:3000/api/publication/${this.publicationId}`,{
+            // Get likes of one publication
+            axios.get(`http://localhost:3000/api/like-publication/${this.publicationId}`,{
                 headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage()}` }
             })
             .then(res => {
-                this.publication = res.data[0]
+                this.likes = res.data
             }) 
             .catch(error => {
                 console.log(error.res);
             })
         },
-        
 
-        deletePublication(){
-            const confirmMsgDeletePublication = confirm('Attention, cette action est irreversible. Etes-vous sûr de vouloir supprimer votre publication ?')
+        getPublicationsLikedByOneUser(){
 
-            if(confirmMsgDeletePublication == true){
-                axios.delete(`http://localhost:3000/api/publication/${this.publicationId}`, {
-                    headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage()}` }
-                })
+            // Get Publications Liked by one user
+            axios.get(`http://localhost:3000/api/like-publication/user/${this.publicationId}`,{
+                headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage()}` }
+            })
+            .then(res => {
+                for(let i = 0; i < res.data.length; i++){
+                    this.arrayPublicationLikedByUser.push(res.data[i].publication_id)
+                }
+                localStorage.setItem('groupomania_publicationsLiked', JSON.stringify(this.arrayPublicationLikedByUser))
+            }) 
+            .catch(error => {
+                console.log(error.res);
+            })
+        },
+
+
+        onLikePublication(){
+
+            if(!this.getPublicationsLikedFromLocalStorage()){
+
+                localStorage.setItem('groupomania_publicationsLiked', JSON.stringify([this.publicationId])) 
+
+                axios.post(`http://localhost:3000/api/like-publication/${this.publicationId}`, 
+                { like: 1 },
+                { headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage() }`}})
                 .then(res => {
-                    console.log(res);
+                    console.log(res)
 
-                    // Get publications
-                    axios.get('http://localhost:3000/api/publication',{
+                    // Get likes of one publication
+                    axios.get(`http://localhost:3000/api/like-publication/${this.publicationId}`,{
                         headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage()}` }
                     })
                     .then(res => {
-                        this.$emit('event-update-publications', { publications: res.data })
+                        this.likes = res.data
                     }) 
                     .catch(error => {
                         console.log(error.res);
                     })
                 })
-                .catch(error => {
-                    console.log(error.res);
+                .catch(err => {
+                    console.log(err.response);
                 })
-            } else{
-                alert('Suppression de la publication annulée.')               
+                
+            } else {
+
+                if(this.getPublicationsLikedFromLocalStorage().includes(this.publicationId)){
+
+                    const arrPublicationsLiked = this.getPublicationsLikedFromLocalStorage()
+                    const newArrPublicationsLiked = arrPublicationsLiked.filter(id => id !== this.publicationId)
+                    localStorage.setItem('groupomania_publicationsLiked', JSON.stringify(newArrPublicationsLiked)) 
+
+                    axios.post(`http://localhost:3000/api/like-publication/${this.publicationId}`, 
+                    { like: 0 },
+                    { headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage() }`}})
+                    .then(res => {
+
+                        console.log(res)
+
+                        // Get likes of one publication
+                        axios.get(`http://localhost:3000/api/like-publication/${this.publicationId}`,{
+                            headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage()}` }
+                        })
+                        .then(res => {
+                            this.likes = res.data
+
+                        }) 
+                        .catch(error => {
+                            console.log(error.res);
+                        })
+                    })
+                    .catch(err => {
+                        console.log(err.response);
+                    })
+
+                } else {
+
+                    const arrPublicationsLiked = this.getPublicationsLikedFromLocalStorage()
+                    arrPublicationsLiked.push(this.publicationId)
+                    localStorage.setItem('groupomania_publicationsLiked', JSON.stringify(arrPublicationsLiked))
+
+                    axios.post(`http://localhost:3000/api/like-publication/${this.publicationId}`, 
+                    { like: 1 },
+                    { headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage() }`}})
+                    .then(res => {
+
+                        console.log(res)
+
+                        // Get likes of one publication
+                        axios.get(`http://localhost:3000/api/like-publication/${this.publicationId}`,{
+                            headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage()}` }
+                        })
+                        .then(res => {
+                            this.likes = res.data
+
+                        }) 
+                        .catch(error => {
+                            console.log(error.res);
+                        })
+                    })
+                    .catch(err => {
+                        console.log(err.response);
+                    })
+                }
             }
-        }, 
 
-
-        getCommentsOfOnePublication(){
-
-            axios.get(`http://localhost:3000/api/comment-publication/${this.publicationId}`,{
-                headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage()}` }
-            })
-            .then(res => {
-                this.comments = res.data
-            }) 
-            .catch(error => {
-                console.log(error.res);
-            })
         },
-
-        updateComments(payload){
-            this.comments = payload.comments
-        },
-
+ 
 
         replaceSymbol(message){
             return message.split('&apos;').join("'")

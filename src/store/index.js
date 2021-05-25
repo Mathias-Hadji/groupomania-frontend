@@ -11,11 +11,13 @@ export default createStore({
 
         publications: [],
 
+
     },
     getters: {
 
     },
     mutations: {
+
 
         setPublicationsFromVueX(state, new_value){
             state.publications = new_value;

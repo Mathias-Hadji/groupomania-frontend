@@ -1,7 +1,10 @@
 <template>
     <div class="news">
-        <CreateNewPublication />
-        <Publication
+        <CreateNewPublication
+            @event-update-publications="updatePublications"
+        />
+        <Publication 
+            @event-update-publications="updatePublications"
             v-for="(publication, index) in publications"
             v-bind:key="index"
             v-bind:publicationId="publication.id"
@@ -38,6 +41,7 @@ export default {
             headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage()}` }
         })
         .then(response => {
+            console.log(response.data)
             this.publications = response.data
         }) 
         .catch(error => {
@@ -45,18 +49,19 @@ export default {
         })
     },
 
+
     computed: {
-        publicationSelectedFromVueX(){
-            return this.$store.state.publicationSelectedFromVueX
-        },
-        getHideListPublicationFromVueX(){
-            return this.$store.state.hideListPublicationFromVueX
-        },
     },
 
     methods: {
+
+
         getTokenFromLocalStorage(){
             return JSON.parse(localStorage.getItem('groupomania_token'))
+        },
+
+        updatePublications(payload){
+            this.publications = payload.publications
         },
     },
 }
