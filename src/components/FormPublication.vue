@@ -24,22 +24,23 @@
 import axios from 'axios';
 
 export default {
+    name: 'FormPublication',
 
     data(){
         return {
-            message: "",
-            file: "",
+            message: '',
+            file: '',
 
             imageTempUrl: null,
             selectedFile: null,
         }
     },
+
     methods:{
 
         createNewPublication(){
             let formData = new FormData()
-            formData.append('userId', this.getUserIdFromLocalStorage());
-            formData.append('message', this.replaceSymbol(this.message));
+            formData.append('message', this.message);
             formData.append('image', this.selectedFile);
 
             axios.post('http://localhost:3000/api/publication', formData, {
@@ -48,21 +49,12 @@ export default {
                     'Content-Type': 'multipart/form-data',
                 }
             })
-            .then(response => {
-                console.log(response)
+            .then(() => {
                 this.message = ''
-
-                // Get publications
-                axios.get('http://localhost:3000/api/publication',{
-                    headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage()}` }
-                })
-                .then(response => {
-                    console.log(response)
-                    this.$emit('event-update-publications', { publications: response.data})
-                }) 
-                .catch(error => {
-                    console.log(error.response);
-                })
+                this.file = ''
+                this.imageTempUrl = null
+                this.selectedFile = null
+                this.$emit('updateListOfPublications')
             })
             .catch(error => console.log(error));
         },

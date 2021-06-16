@@ -1,23 +1,26 @@
 <template>
-    <div class="card">
-        <h1 class="card__title"> Se connecter</h1>
-        <p class="card__subtitle">Vous n'avez pas encore de compte ? <span class="card__action" @click=switchToCreateAccount>Créer un compte</span></p>
+    <div class="main-container">
+        <div class="card">
+            <h1 class="card__title"> Se connecter</h1>
+            <p class="card__subtitle">Vous n'avez pas encore de compte ? <span class="card__action" @click=switchToCreateAccount>Créer un compte</span></p>
 
-        <div class="form-row">
-            <input v-model="inputEmail" class="form-row__input" type="email" placeholder="Adresse mail"/>
-        </div>
-        <div class="form-row">
-            <input v-model="inputPassword" class="form-row__input" type="password" placeholder="Mot de passe"/>
-        </div>
-        <div class="form-row">
-            <button @click="login()" class="button" v-bind:class="{'button--disabled' : !btnDisabled}" v-bind:disabled="!btnDisabled" type="submit">Se connecter</button>
-        </div>
+            <div class="form-row">
+                <input v-model="inputEmail" class="form-row__input" type="email" placeholder="Adresse mail"/>
+            </div>
+            <div class="form-row">
+                <input v-model="inputPassword" class="form-row__input" type="password" placeholder="Mot de passe"/>
+            </div>
+            <div class="form-row">
+                <button @click="login()" class="button" v-bind:class="{'button--disabled' : !btnDisabled}" v-bind:disabled="!btnDisabled" type="submit">Se connecter</button>
+            </div>
 
-        <div>
-            <p v-if="successMsgLogin != null" class="text-success">{{ successMsgLogin }}</p> 
-            <p v-if="errorMsgLogin != null" class="text-danger">{{ errorMsgLogin }}</p> 
+            <div>
+                <p v-if="successMsgLogin != null" class="text-success">{{ successMsgLogin }}</p> 
+                <p v-if="errorMsgLogin != null" class="text-danger">{{ errorMsgLogin }}</p> 
+            </div>
         </div>
     </div>
+
 </template>
 
 <script>
@@ -67,6 +70,7 @@ export default {
             this.$store.state.modeFromVueX = 'createAccount';
         },
 
+
         login(){
 
             if(this.emailRegExp.test(this.inputEmail) && this.passwordRegExp.test(this.inputPassword)){
@@ -81,7 +85,9 @@ export default {
                     
                     this.setTokenFromLocalStorage(response.data.token);
                     this.setUserIdFromLocalStorage(response.data.userId);
-                    window.location.href = 'news';
+                    
+                    this.$store.state.modeFromVueX = 'connected';
+                    
                 })
                 .catch(error => {
                     console.log(error.response.data);
@@ -104,52 +110,94 @@ export default {
 
 <style scoped lang="scss">
 
-.card {
-    max-width: 100%;
-    width: 540px;
-    background:white;
-    border-radius: 16px;
-    padding:32px;
+.main-container{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 
-    &__title {
-        text-align:center;
-        font-weight: 800;
-    }
-
-    &__subtitle {
-        text-align: center;
-        color:#666;
-        font-weight: 500;
-    }
-
-    &__action {
-        color:#2196F3;
-        text-decoration: underline;
-        cursor: pointer;
-    } 
-
-    .form-row{
+    .nav {
+        width: 100%;
+        height: 100px;
+        padding: 30px;
         display: flex;
-        margin: 16px 0px;
-        gap: 16px;
-        flex-wrap: wrap;
+        background: #fff;
 
-        &__input{
-            padding: 8px;
-            border: none;
-            border-radius: 9px;
-            background: #f2f2f2;
-            font-weight: 500;
-            font-size: 16px;
-            flex: 1;
-            min-width: 100px;
-            color: black;
-            position: relative;
+        .container-elt{
+            display: flex;
+            align-items: center;
+
+            #logo {
+                height: 30px;
+            }
+        }
+    }
+
+    .card {
+        margin-top: 150px;
+        max-width: 100%;
+        width: 540px;
+        background:white;
+        border-radius: 16px;
+        padding:32px;
+
+        .card-logo-container{
+
+            width: 100%;
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+            height: 50px;
         }
 
-        &__input::placeholder{
-            color: #aaaaaa;
-        }    
+
+        &__title {
+            text-align:center;
+            font-weight: 800;
+        }
+
+        &__subtitle {
+            text-align: center;
+            color:#666;
+            font-weight: 500;
+        }
+
+        &__action {
+            color:#2196F3;
+            text-decoration: underline;
+            cursor: pointer;
+        } 
+
+        .form-row{
+            display: flex;
+            margin: 16px 0px;
+            gap: 16px;
+            flex-wrap: wrap;
+
+            &__input{
+                padding: 8px;
+                border: none;
+                border-radius: 9px;
+                background: #f2f2f2;
+                font-weight: 500;
+                font-size: 16px;
+                flex: 1;
+                min-width: 100px;
+                color: black;
+                position: relative;
+            }
+
+            &__input::placeholder{
+                color: #aaaaaa;
+            }    
+        }
     }
+
 }
+
+
+
+
+
 </style>

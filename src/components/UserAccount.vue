@@ -11,8 +11,8 @@
                 <label v-if="validBtnProfilePic == false" class="div-profile-pic__label" for="profilePic">Modifier</label>
                 <input @change="previewImage" id="profilePic" class="div-profile-pic__input" type="file" name="profilePic">
                 <div class="group-btn">
-                    <button v-if="validBtnProfilePic == true" @click="modifyProfilePic" class="group-btn__btn button-primary">Valider</button>
                     <button v-if="cancelBtnProfilePic == true" @click="cancelModifyProfilePic" class="group-btn__btn button-danger">Annuler</button>
+                    <button v-if="validBtnProfilePic == true" @click="modifyProfilePic" class="group-btn__btn button-primary">Valider</button>
                 </div>
                 <p v-if="successMsgProfilePic != null" class="div-profile-pic__success-message text-success">{{ successMsgProfilePic }}</p> 
                 <p v-if="errorMsgProfilePic != null" class="div-profile-pic__error-message text-danger">{{ errorMsgProfilePic }}</p>
@@ -23,13 +23,13 @@
                     <h2 class="under-div-user-information__title">Email</h2>
                     <p>{{ userEmail }}</p>
                 </div> 
-                <div class="under-div-user-description">
-                    <h2 class="under-div-user-description__title">Description</h2>
-                    <p class="under-div-user-description__description">{{ userDescription }}</p>
-                    <textarea v-model="inputUserDescription" class="under-div-user-description__message-input" rows="5" maxlength="255" placeholder="Ajouter un texte ..."></textarea>
-                    <button @click="modifyUserDescription" class="button">Modifier ma description</button>
-                    <p v-if="successMsgDescription != null" class="under-div-user-description__success-message text-success">{{ successMsgDescription }}</p> 
-                    <p v-if="errorMsgDescription != null" class="under-div-user-description__error-message text-danger">{{ errorMsgDescription }}</p>   
+                <div class="under-div-user-bio">
+                    <h2 class="under-div-user-bio">Bio</h2>
+                    <p class="under-div-user-bio__bio">{{ bioUser }}</p>
+                    <textarea v-model="inputBioUser" class="under-div-user-bio__message-input" rows="5" maxlength="255" placeholder="Ajouter un texte ..."></textarea>
+                    <button @click="modifyBioUser" class="button">Modifier ma bio</button>
+                    <p v-if="successMsgBio != null" class="under-div-user-bio__success-message text-success">{{ successMsgBio }}</p> 
+                    <p v-if="errorMsgBio != null" class="under-div-user-bio__error-message text-danger">{{ errorMsgBio }}</p>   
                 </div>
             </div>
         </div>
@@ -42,14 +42,12 @@
                 <div class="div-password">
                     <label class="div-password__label" for="current-password">Mot de passe actuel :</label>
                     <input v-model="inputUserCurrentPassword" class="div-password__input" type="password" name="current-password" required>
-                    <p v-if="errorMsgCurrentPassword != null" class="div-password__error-message text-danger">{{ errorMsgCurrentPassword }}</p>
                 </div>
                 <div class="div-password">
                     <label class="div-password__label" for="new-password">Nouveau mot de passe :</label>
                     <input v-model="inputUserNewPassword" class="div-password__input" type="password" name="new-password" required>
-                    <p v-if="errorMsgNewPassword != null" class="div-password__error-message text-danger">{{ errorMsgNewPassword }}</p>
-                    
                     <button @click="modifyPassword" v-bind:disabled="btnDisabled == true" v-bind:class="{'button--disabled' : btnDisabled}" class="button">Valider</button>
+                    <p v-if="errorMsgCurrentPassword != null" class="div-password__error-message text-danger">{{ errorMsgCurrentPassword }}</p>
                     <p v-if="successMsgPassword != null" class="div-password__success-message text-success">{{ successMsgPassword }}</p>
                 </div>
             </div>
@@ -75,8 +73,8 @@ export default {
 
             userEmail: '',
 
-            inputUserDescription: '',
-            userDescription:'',
+            inputBioUser: '',
+            bioUser:'',
 
             inputUserCurrentPassword: '',
             inputUserNewPassword: '',
@@ -93,8 +91,8 @@ export default {
             errorMsgCurrentPassword: null,
             errorMsgNewPassword:null,
 
-            successMsgDescription: null,
-            errorMsgDescription: null,
+            successMsgBio: null,
+            errorMsgBio: null,
 
             successMsgProfilePic: null,
             errorMsgProfilePic: null,
@@ -108,7 +106,7 @@ export default {
         })
         .then(res => {
 
-            this.userData = res.data.result[0]
+            this.userData = res.data
 
             this.profilePicUser = this.userData.profile_pic_user
 
@@ -116,9 +114,9 @@ export default {
             this.lastNameUser = this.userData.last_name_user
 
             this.userEmail = this.userData.email_user
-            this.userDescription = this.userData.description_user
+            this.bioUser = this.userData.bio_user
         })
-        .catch(error => console.log(error.response))
+        .catch(error => console.log(error))
     },
 
     computed:{
@@ -157,18 +155,15 @@ export default {
 
         modifyProfilePic(){
             let formData = new FormData()
-            formData.append('userId', this.getUserIdFromLocalStorage());
             formData.append('image', this.selectedFile);
 
-            axios.put(`http://localhost:3000/api/user/profile-pic/${this.getUserIdFromLocalStorage()}`, 
-            formData, 
-            { headers: {
+            axios.put(`http://localhost:3000/api/user/profile-pic`, formData, { 
+                headers: {
                     Authorization: `Bearer ${this.getTokenFromLocalStorage()}`,
                     'Content-Type': 'multipart/form-data',
                 }
             })
             .then(response => {
-
                 this.errorMsgProfilePic = null;
                 this.successMsgProfilePic = response.data.message;
 
@@ -176,15 +171,16 @@ export default {
                     headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage() }`}
                 })
                 .then(response => {
-
-                    this.profilePicUser = response.data.result[0].profile_pic_user
+                    this.profilePicUser = response.data.profile_pic_user
                 })
-                .catch(error => console.log(error.response))
+                .catch(error => { 
+                    console.log(error.response)
+                })
 
             })
             .catch(error => {
-                console.log(error)
-                this.errorMsgProfilePic = error.response.data.notValid;
+                this.successMsgProfilePic = null;
+                console.log(error.response)
             });
         },
 
@@ -193,36 +189,43 @@ export default {
             this.reloadPage()
         },
 
-        modifyUserDescription(){
-            axios.put(`http://localhost:3000/api/user/description/${this.getUserIdFromLocalStorage()}`, 
-            { inputUserDescription: this.inputUserDescription },
+        modifyBioUser(){
+            axios.put(`http://localhost:3000/api/user/bio`, 
+            { bioUser: this.inputBioUser },
             {
                 headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage() }`}            
             })
             .then(res => {
-                this.errorMsgDescription = null;
-                this.successMsgDescription = res.data.message;
+                this.errorMsgBio = null;
+                this.successMsgBio = res.data.message;
+
 
                 axios.get(`http://localhost:3000/api/user/${this.getUserIdFromLocalStorage()}`,{
                     headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage() }`}
                 })
                 .then(res => {
-
-                    this.userDescription = res.data.result[0].description_user
+                    this.bioUser = res.data.bio_user
+                    this.inputBioUser = ''
                 })
-                .catch(error => console.log(error.response))
+                .catch(error => {
+                    console.log(error.response)
+                })
 
             })
             .catch(err => {
-                console.log(err)
-                this.errorMsgDescription = err.response.data.notValid;
+                this.successMsgBio = null
+                console.log(err.response)
+                this.errorMsgBio = err.response.data.message;
             })
         },
 
         modifyPassword(){
 
-            axios.put(`http://localhost:3000/api/user/password/${this.getUserIdFromLocalStorage()}`, 
-            { inputUserCurrentPassword: this.inputUserCurrentPassword, inputUserNewPassword: this.inputUserNewPassword},
+            axios.put(`http://localhost:3000/api/user/password`, 
+            { 
+                inputUserCurrentPassword: this.inputUserCurrentPassword, 
+                inputUserNewPassword: this.inputUserNewPassword
+            },
             { headers: { 
                 Authorization: `Bearer ${this.getTokenFromLocalStorage() }`}})
             .then(res => {
@@ -233,7 +236,7 @@ export default {
                 this.inputUserNewPassword = ''
             })
             .catch(err => {
-                console.log(err.response);
+                this.successMsgPassword = null;
                 this.errorMsgCurrentPassword = err.response.data.notValid;
                 this.errorMsgNewPassword = err.response.data.notValid;
                 this.inputUserCurrentPassword = ''
@@ -246,14 +249,19 @@ export default {
             const confirmMsgDeleteAccount = confirm('Attention, cette action est irreversible. Etes-vous sûr de vouloir supprimer votre compte ?')
 
             if(confirmMsgDeleteAccount == true){
-                axios.delete(`http://localhost:3000/api/user/${this.getUserIdFromLocalStorage()}`, {
+                axios.delete(`http://localhost:3000/api/user/delete-account`, {
                     headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage() }`}
                 })
-                .then(res => {
-                    console.log(res)
+                .then(() => {
+
+                    window.localStorage.removeItem('groupomania_token');
+                    window.localStorage.removeItem('groupomania_publicationsLiked');
+                    window.localStorage.removeItem('groupomania_userId');
+
                     window.location.href = '/';
+
                 })
-                .catch(err => console.log(err))
+                .catch(error => console.log(error.response))
             } else {
                 alert('Suppression de votre compte annulée.')
             }
@@ -371,7 +379,7 @@ export default {
             text-align: left;
             padding: 0 40px 0 40px;
 
-            .under-div-user-information, .under-div-user-description{
+            .under-div-user-information, .under-div-user-bio{
                 display: flex;
                 flex-direction: column;
                 margin-bottom: 20px;
@@ -380,7 +388,7 @@ export default {
                     margin-bottom: 10px;
                 }
 
-                &__description{
+                &__bio{
                     margin-bottom: 20px;
                 }
                 
@@ -443,13 +451,11 @@ export default {
                     font-family: Avenir, Helvetica, Arial, sans-serif;
                     margin-bottom: 20px;
                 }
-                &__error-message{
-                    margin-bottom: 20px;
-                }
-                &__success-message{
+                &__error-message, &__success-message{
                     margin-top: 20px;
+                    margin-bottom: 20px;
                     text-align: center;
-                }                
+                }              
             }
         }
 

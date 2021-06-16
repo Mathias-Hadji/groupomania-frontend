@@ -1,13 +1,15 @@
 <template>
     <div class="news">
-        <CreateNewPublication
-            @event-update-publications="updatePublications"
+
+        <FormPublication
+            v-on:updateListOfPublications="getAllPublications()"
         />
-        <Publication 
-            @event-update-publications="updatePublications"
-            v-for="(publication, index) in publications"
-            v-bind:key="index"
+
+        <PublicationCard
+            v-for="publication in getPublicationsFromVueX"
+            v-bind:key="publication.id"
             v-bind:publicationId="publication.id"
+            v-on:updateListOfPublications="getAllPublications()"
         />
     </div>
 </template>
@@ -17,51 +19,51 @@
 <script>
 import axios from 'axios';
 
-import CreateNewPublication from '@/components/CreateNewPublication.vue'
-import Publication from '@/components/Publication.vue'
+import FormPublication from '@/components/FormPublication.vue'
+import PublicationCard from '@/components/PublicationCard.vue'
 
 export default {
     name: 'News',
 
     components: {
-        CreateNewPublication,
-        Publication,
+        FormPublication,
+        PublicationCard,
     },
 
     data(){
         return {
-            publications: [],
+
         }
     },
 
-
     mounted(){
-        // Get publications
-        axios.get('http://localhost:3000/api/publication',{
-            headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage()}` }
-        })
-        .then(response => {
-            console.log(response.data)
-            this.publications = response.data
-        }) 
-        .catch(error => {
-            console.log(error.response);
-        })
+        this.getAllPublications()
     },
 
-
     computed: {
+        
+        getPublicationsFromVueX(){
+            return this.$store.state.listOfPublicationsFromVueX
+        }
     },
 
     methods: {
+        
+        getAllPublications(){
+            axios.get('http://localhost:3000/api/publication',{
+                headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage()}` }
+            })
+            .then(response => {
+                this.$store.state.listOfPublicationsFromVueX = response.data;
+            }) 
+            .catch(error => {
+                console.log(error.response);
+            })
+        },
 
 
         getTokenFromLocalStorage(){
             return JSON.parse(localStorage.getItem('groupomania_token'))
-        },
-
-        updatePublications(payload){
-            this.publications = payload.publications
         },
     },
 }

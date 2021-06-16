@@ -4,12 +4,13 @@ export default createStore({
     
     state: {
         modeFromVueX:'login',
+        listOfPublicationsFromVueX: null,
+
+
         hideListPublicationFromVueX: false,
-        allPublications: [],
+
         publicationData: [],
         commentsOfPublication: [],
-
-        publications: [],
 
 
     },
@@ -19,16 +20,12 @@ export default createStore({
     mutations: {
 
 
-        setPublicationsFromVueX(state, new_value){
-            state.publications = new_value;
+        setPublicationListFromVueX(state, new_value){
+            state.publicationListFromVueX = new_value;
         },
 
         setPublicationId(state, new_value){
             state.publicationId = new_value;
-        },
-
-        setAllPublicationsFromVueX(state, new_value){
-            state.allPublications = new_value;
         },
 
         setHideListPublicationFromVueX(state, new_value){
