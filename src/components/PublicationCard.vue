@@ -12,7 +12,7 @@
                     <div class="publication-info">
                         <p class="publication-info__author-name"> {{ authorPublicationData.first_name_user }} {{ authorPublicationData.last_name_user }}</p>
                         <p class="publication-info__date">{{ publicationData.createdAt }}</p>
-                        <p v-if="getUserIdFromLocalStorage() == publicationData.user_id_publication" class="publication-info__delete" @click="deletePublication()">X</p>
+                        <p v-if="getUserIdFromLocalStorage() == publicationData.user_id_publication || getIsAdminFromLocalStorage() == 1" class="publication-info__delete" @click="deletePublication()">X</p>
                     </div>          
                 </div> 
 
@@ -59,7 +59,7 @@
                             <div class="commentary-info">
                                 <p class="commentary-info__author-name">{{ comment.User.first_name_user }} {{ comment.User.last_name_user }}</p>
                                 <p class="commentary-info__date">{{ comment.createdAt }}</p>
-                                <p v-if="getUserIdFromLocalStorage() == comment.user_id_comment" class="commentary-info__delete" @click="deleteOneComment(comment.id)">X</p>
+                                <p v-if="getUserIdFromLocalStorage() == comment.user_id_comment || getIsAdminFromLocalStorage() == 1" class="commentary-info__delete" @click="deleteOneComment(comment.id)">X</p>
                             </div> 
                             <div class="message-user-commentary">
                                 <p>{{ comment.comment }}</p>
@@ -299,6 +299,10 @@ export default {
 
         getUserIdFromLocalStorage(){
             return JSON.parse(localStorage.getItem('groupomania_userId'))
+        },    
+
+        getIsAdminFromLocalStorage(){
+            return JSON.parse(localStorage.getItem('groupomania_isAdmin'))
         },    
     },
 

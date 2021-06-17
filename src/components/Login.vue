@@ -64,6 +64,10 @@ export default {
 
         setUserIdFromLocalStorage(userId){
             localStorage.setItem('groupomania_userId', JSON.stringify(userId))
+        }, 
+
+        setIsAdminFromLocalStorage(isAdmin){
+            localStorage.setItem('groupomania_isAdmin', JSON.stringify(isAdmin))
         },  
 
         switchToCreateAccount(){
@@ -78,14 +82,15 @@ export default {
                 axios.post('http://localhost:3000/api/user/login',
                 { email: this.inputEmail.trim(), password: this.inputPassword })
                 .then(response => {
-                    console.log(response.data);
 
                     this.errorMsgLogin = null;
                     this.successMsgLogin = response.data.message;
                     
                     this.setTokenFromLocalStorage(response.data.token);
                     this.setUserIdFromLocalStorage(response.data.userId);
+                    this.setIsAdminFromLocalStorage(response.data.isAdmin);
                     
+
                     this.$store.state.modeFromVueX = 'connected';
                     
                 })
