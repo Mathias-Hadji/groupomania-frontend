@@ -12,7 +12,7 @@
                     <div class="publication-info">
                         <p class="publication-info__author-name"> {{ authorPublicationData.first_name_user }} {{ authorPublicationData.last_name_user }}</p>
                         <p class="publication-info__date">{{ publicationData.createdAt }}</p>
-                        <p v-if="getUserIdFromLocalStorage() == publicationData.user_id_publication || getIsAdminFromLocalStorage() == 1" class="publication-info__delete" @click="deletePublication()">X</p>
+                        <img class="publication-info__delete" width="15" src="../assets/times-solid.svg" v-if="getUserIdFromLocalStorage() == publicationData.user_id_publication || getIsAdminFromLocalStorage() == 1" @click="deletePublication()">
                     </div>          
                 </div> 
 
@@ -42,9 +42,21 @@
                         <img class="commitment-section-row__icon" src="../assets/comment-solid.svg"><span>{{ comments.length }}</span>
                     </div>
 
-                    <!--<div class="commitment-section-row">
+                    <div @click="onSharePublication()" class="commitment-section-row">
                         <img class="commitment-section-row__icon" src="../assets/share-solid.svg"><span>PARTAGER</span>
-                    </div>-->
+                    </div>
+                    <div v-if="showUrlPublication == true" class="commitment-section-row">
+                        <div v-if="shareLinkIsClicked == false" class="container-share-publication">
+                            <img @click="copyText()" class="container-share-publication__share-btn-copy" src="../assets/copy-regular.svg" width="25">
+                            <p @click="copyText()">Copier le lien</p>
+                        </div>
+                        <div v-else class="container-success-share-publication">
+                            <img src="../assets/check-solid.svg" width="25">
+                            <p class="commitment-section-row__msg-success-copy">Copié !</p>
+                        </div>
+
+
+                    </div>
                 </div>
                 <hr>
                 <div class="commentary-section">
@@ -59,7 +71,8 @@
                             <div class="commentary-info">
                                 <p class="commentary-info__author-name">{{ comment.User.first_name_user }} {{ comment.User.last_name_user }}</p>
                                 <p class="commentary-info__date">{{ comment.createdAt }}</p>
-                                <p v-if="getUserIdFromLocalStorage() == comment.user_id_comment || getIsAdminFromLocalStorage() == 1" class="commentary-info__delete" @click="deleteOneComment(comment.id)">X</p>
+                                
+                                <img class="commentary-info__delete" src="../assets/times-solid.svg" width="15" v-if="getUserIdFromLocalStorage() == comment.user_id_comment || getIsAdminFromLocalStorage() == 1" @click="deleteOneComment(comment.id)">
                             </div> 
                             <div class="message-user-commentary">
                                 <p>{{ comment.comment }}</p>
@@ -95,6 +108,12 @@ export default {
         publicationId: Number,
     },
 
+    computed: {
+        urlPublication(){
+            return 'http://localhost:8080/post/?id=' + this.publicationData.id
+        }
+    },
+
     data(){
         return {
             publicationData: [],
@@ -106,6 +125,9 @@ export default {
             comments: [],
             profilePicUser: '',
             addNewComment: '',
+
+            showUrlPublication: false,
+            shareLinkIsClicked: false,
         }
     },
 
@@ -117,9 +139,17 @@ export default {
         this.getUserLoggedInformations()
     },
 
-
-
     methods:{
+
+        onSharePublication(){
+            this.showUrlPublication = !this.showUrlPublication
+            this.shareLinkIsClicked = false
+        },
+
+        copyText() {
+            navigator.clipboard.writeText(this.urlPublication)
+            this.shareLinkIsClicked = !this.shareLinkIsClicked
+        },
 
 
         getOnePublication(){
@@ -311,6 +341,8 @@ export default {
 
 <style scoped lang="scss">
 
+
+
 .user-commentary-container{
     width: 100%;
     display: flex;
@@ -336,7 +368,7 @@ export default {
         color: #474747;
         font-weight: bold;
         cursor: pointer;
-        transition-duration: 0.2s;
+        filter: invert(35%) sepia(0%) saturate(1691%) hue-rotate(269deg) brightness(95%) contrast(76%);
     }
 
     &__delete:hover{
@@ -408,8 +440,8 @@ export default {
 
             .commitment-section{
                 display: flex;
+                flex-wrap: wrap;
                 align-items: center;
-
                 margin-bottom: 15px;
 
                 .commitment-section-row{
@@ -418,11 +450,31 @@ export default {
                     cursor: pointer;
                     margin-right: 50px;
 
+                    .container-share-publication{
+                        display: flex;
+                        align-items: center;
+
+                        img{
+                            margin-right: 5px;
+                        }
+                    }
+
+                    .container-success-share-publication{
+                        display: flex;
+                        align-items: center;
+
+                        img{
+                            margin-right: 5px;
+                            filter: invert(61%) sepia(67%) saturate(329%) hue-rotate(46deg) brightness(101%) contrast(92%);
+                        }
+                    }
+
                     &__icon{
                         filter: invert(18%) sepia(3%) saturate(36%) hue-rotate(328deg) brightness(91%) contrast(81%);         
                         width: 20px;
                         margin-right: 10px;
                     }
+
                 }
             }
 
@@ -450,6 +502,7 @@ export default {
 
                     .new-commentary{
                         display: flex;
+                        flex-wrap: wrap;
                         align-items: center;
                         width: 100%;
 
