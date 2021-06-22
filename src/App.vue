@@ -1,15 +1,23 @@
 <template>
-    <HeaderNav/>
-    <router-view/>
+    <div>
+        <!--<HeaderNav/>-->
+        <router-view/>
+    </div>
 </template>
 
 
 <script>
-import HeaderNav from '@/components/HeaderNav.vue'
+//import HeaderNav from '@/components/HeaderNav.vue'
 
 export default {
     components: {
-        HeaderNav,
+        //HeaderNav,
+    },
+
+    computed: {
+        modeFromVueX(){
+            return this.$store.state.modeFromVueX
+        }
     }
 }
 </script>
@@ -26,29 +34,10 @@ export default {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     color: #2c3e50;
-}
-body{
     background-image: linear-gradient(62deg, #7e91fb 0%, #6876f7 100%);
     min-height: 100vh;
 }
-#nav {
-    padding: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    background: #fff;
-    #logo {
-        height: 30px;
-    }
-    a {
-        font-weight: bold;
-        color: #2c3e50;
-        text-decoration: none;
-        &.router-link-exact-active {
-        color: #2196F3;
-        }
-    }
-}
+
 .button {
     background: #2196F3;
     color:white;
@@ -59,6 +48,10 @@ body{
     width: 100%;
     padding: 16px;
     transition: .4s background-color;
+}
+.button:hover {
+    cursor:pointer;
+    background: #1976D2;
 }
 .button-primary{
     background: #2196F3;
@@ -74,10 +67,6 @@ body{
 }
 .button-danger:hover{
     background: rgb(212, 0, 0);
-}
-.button:hover {
-    cursor:pointer;
-    background: #1976D2;
 }
 .button--disabled {
     background:#cecece;
@@ -126,7 +115,5 @@ body{
 textarea{
     resize: none;
 }
-.dispflex{
-    display: flex;
-}
+
 </style>

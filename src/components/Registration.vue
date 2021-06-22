@@ -1,5 +1,5 @@
 <template>
-    <div class="main-container">
+    <div class="registration-container">
         <div class="card">
             <h1 class="card__title"> S'inscrire</h1>
             <p class="card__subtitle">Vous avez déjà un compte ? <span class="card__action" @click=switchToLogin>Se connecter</span></p>
@@ -166,38 +166,20 @@ export default {
 
 <style scoped lang="scss">
 
-.main-container{
-
+.registration-container{
     width: 100%;
     height: 100%;
     display: flex;
-    flex-direction: column;
+    justify-content: center;
     align-items: center;
 
-    .nav {
-        width: 100%;
-        height: 100px;
-        padding: 30px;
-        display: flex;
-        background: #fff;
-
-        .container-elt{
-            display: flex;
-            align-items: center;
-
-            #logo {
-                height: 30px;
-            }
-        }
-    }
-
     .card {
-        margin-top: 150px;
-        max-width: 100%;
         width: 540px;
+        height: 100%;
         background:white;
         border-radius: 16px;
         padding:32px;
+        margin: 75px 20px;
 
         &__title {
             text-align:center;
@@ -214,7 +196,7 @@ export default {
             color:#2196F3;
             text-decoration: underline;
             cursor: pointer;
-        }
+        } 
 
         .form-row{
             display: flex;
@@ -222,7 +204,18 @@ export default {
             gap: 16px;
             flex-wrap: wrap;
 
-
+            &__input{
+                padding: 8px;
+                border: none;
+                border-radius: 9px;
+                background: #f2f2f2;
+                font-weight: 500;
+                font-size: 16px;
+                flex: 1;
+                min-width: 100px;
+                color: black;
+                position: relative;
+            }
 
             &__input::placeholder{
                 color: #aaaaaa;

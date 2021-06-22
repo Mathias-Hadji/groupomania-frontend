@@ -5,14 +5,14 @@
         </div>
         <div class="container-elt-link">
             <div class="link">
-                <router-link class="nav-item" to="/news">Accueil</router-link>
+                <router-link class="nav-item" to="/news"><img src="../assets/home-solid.svg" width="25"></router-link>
             </div>
             
-            <div v-if="mode == 'connected'" class="link">
-                <router-link class="nav-item profile-pic-user" to="/profile">Mon compte</router-link>
+            <div class="link">
+                <router-link class="nav-item profile-pic-user" to="/profile"><img :src="profilePicUser" width="25"></router-link>
             </div>
-            <div v-if="mode == 'connected'" class="link">
-                <router-link @click="onClickDisconected" class="nav-item" to="/">Deconnexion</router-link>
+            <div class="link">
+                <router-link @click="onClickDisconected()" class="nav-item" to="/"><img src="../assets/power-off-solid.svg" width="25"></router-link>
             </div>
 
 
@@ -29,7 +29,7 @@ export default {
 
     data(){
         return {
-            profilePicUser: '#',
+            profilePicUser: 'http://localhost:3000/images/profile-pic-user-default/profile-user.svg',
         }
     },
 
@@ -53,12 +53,12 @@ export default {
     },
 
     methods:{
-
-
         onClickDisconected(){
+
             window.localStorage.removeItem('groupomania_token');
             window.localStorage.removeItem('groupomania_publicationsLiked');
             window.localStorage.removeItem('groupomania_userId');
+            window.localStorage.removeItem('groupomania_isAdmin');
         },
 
 
@@ -94,6 +94,7 @@ export default {
         width: 100%;
         display: flex;
         justify-content: flex-end;
+        align-items: center;
         margin-right: 20px;
 
         a{

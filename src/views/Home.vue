@@ -36,15 +36,6 @@ export default {
 </script>
 
 
-
-
-<style scoped>
-    .home{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 600px;
-    }
+<style scoped lang="scss">
 
 </style>

@@ -1,94 +1,112 @@
 <template>
+    <div class="publication-card-container">
+        <div class="card">
 
-    <div class="container-publications">
+            <div class="section-header-publication">
+                <div class="author-publication">
+                    <img class="author-publication__profile-pic" :src="authorPublicationData.profile_pic_user">
+                </div>
+                <div class="info-publication">
+                    <p class="info-publication__author-name"> {{ authorPublicationData.first_name_user }} {{ authorPublicationData.last_name_user }}</p>
+                    <p class="info-publication__date">{{ publicationData.createdAt }}</p>
+                </div>        
+                <div class="delete-publication">
+                    <img class="delete-publication__icon" width="15" src="../assets/times-solid.svg" v-if="getUserIdFromLocalStorage() == publicationData.user_id_publication || getIsAdminFromLocalStorage() == 1" @click="deletePublication()">
+                </div>  
+            </div> 
 
-        <div class="publication">
-            <div class="container-publication">
-            
-                <div class="header-publication">
-                    <div class=profile-pic-section>
-                        <img class="profile-pic-section__author-pic" :src="authorPublicationData.profile_pic_user">
+            <div class="section-content-publication">
+                <div class="message-publication">
+                    <p class="message-publication__text"> {{ publicationData.message_publication }}</p>
+                </div>
+
+                <div class="file-publication">
+                    <img v-if="publicationData.image_publication != ''" class="file-publication__img" :src="publicationData.image_publication">
+                </div>
+            </div>
+
+
+            <div class="section-commitment-publication">
+
+                <div class="like-and-comment-publication">
+                    <div class="like-publication">
+                        <img v-if="arrayPublicationLikedByUser && arrayPublicationLikedByUser.includes(publicationId)" @click="onLikePublication()" class="like-publication__icon" src="../assets/heart-solid.svg">
+                        <img v-else @click="onLikePublication()" class="like-publication__icon" src="../assets/heart-regular.svg">
+                        <p class="like-publication__counter">{{ likesPublication.length }}</p>
                     </div>
-                    <div class="publication-info">
-                        <p class="publication-info__author-name"> {{ authorPublicationData.first_name_user }} {{ authorPublicationData.last_name_user }}</p>
-                        <p class="publication-info__date">{{ publicationData.createdAt }}</p>
-                        <img class="publication-info__delete" width="15" src="../assets/times-solid.svg" v-if="getUserIdFromLocalStorage() == publicationData.user_id_publication || getIsAdminFromLocalStorage() == 1" @click="deletePublication()">
-                    </div>          
-                </div> 
 
-                <div class="content-section">
-                    <div class="publication-text">
-                        <p class="publication-text__message">{{ publicationData.message_publication }}</p>
-                    </div>
-
-                    <div class="publication-file">
-                        <img v-if="publicationData.image_publication != ''" class="publication-file__image" :src="publicationData.image_publication">
+                    <div class="counter-comment-publication">
+                        <img class="counter-comment-publication__icon" src="../assets/comment-solid.svg"><span>{{ comments.length }}</span>
                     </div>
                 </div>
 
-                <div class="commitment-section">
-                    <div  v-if="arrayPublicationLikedByUser && arrayPublicationLikedByUser.includes(publicationId)" class="commitment-section-row">
-                        <img @click="onLikePublication()" class="commitment-section-row__icon commitment-section-row__liked-color" src="../assets/heart-solid.svg"><span class="commitment-section-row__liked-color">{{ likesPublication.length }}</span> 
-                    </div>
-                    <div v-else class="commitment-section-row">
-                        <img @click="onLikePublication()" class="commitment-section-row__icon" src="../assets/heart-regular.svg"><span>{{ likesPublication.length }}</span> 
-                    </div>
 
 
-                    <div v-if="comments.length < 2" class="commitment-section-row">
-                        <img class="commitment-section-row__icon" src="../assets/comment-solid.svg"><span>{{ comments.length }}</span>
-                    </div>
-                    <div v-else class="commitment-section-row">
-                        <img class="commitment-section-row__icon" src="../assets/comment-solid.svg"><span>{{ comments.length }}</span>
-                    </div>
 
-                    <div @click="onSharePublication()" class="commitment-section-row">
-                        <img class="commitment-section-row__icon" src="../assets/share-solid.svg"><span>PARTAGER</span>
-                    </div>
-                    <div v-if="showUrlPublication == true" class="commitment-section-row">
-                        <div v-if="shareLinkIsClicked == false" class="container-share-publication">
-                            <img @click="copyText()" class="container-share-publication__share-btn-copy" src="../assets/copy-regular.svg" width="25">
-                            <p @click="copyText()">Copier le lien</p>
+                <div class="share-publication">
+                    <div v-if="showUrlPublication == true" class="url-publication">
+                        <div v-if="shareLinkIsClicked == false" class="url-publication-hidden">
+                            <img @click="copyText()" class="url-publication-hidden__icon" src="../assets/copy-regular.svg">
+                            <p @click="copyText()" class="url-publication-hidden__text">Copier le lien</p>
                         </div>
-                        <div v-else class="container-success-share-publication">
-                            <img src="../assets/check-solid.svg" width="25">
-                            <p class="commitment-section-row__msg-success-copy">Copié !</p>
-                        </div>
-
-
-                    </div>
-                </div>
-                <hr>
-                <div class="commentary-section">
-
-                    <h2>Commentaires</h2>
-
-                    <div :key="index" v-for="(comment, index) in comments" class="publication-list-commentary-container">
-                        <div class=profile-pic-section>
-                            <img class="profile-pic-section__author-pic" :src="comment.User.profile_pic_user">
-                        </div>
-                        <div class="user-commentary-container">
-                            <div class="commentary-info">
-                                <p class="commentary-info__author-name">{{ comment.User.first_name_user }} {{ comment.User.last_name_user }}</p>
-                                <p class="commentary-info__date">{{ comment.createdAt }}</p>
-                                
-                                <img class="commentary-info__delete" src="../assets/times-solid.svg" width="15" v-if="getUserIdFromLocalStorage() == comment.user_id_comment || getIsAdminFromLocalStorage() == 1" @click="deleteOneComment(comment.id)">
-                            </div> 
-                            <div class="message-user-commentary">
-                                <p>{{ comment.comment }}</p>
-                            </div>
+                        <div v-else class="url-publication-show">
+                            <img class="url-publication-show__icon" src="../assets/check-solid.svg">
+                            <p class="url-publication-show__msg-success-copy">Copié !</p>
                         </div>
                     </div>
-                    <div class="new-commentary-container">
-                        <div class=profile-pic-section>
-                            <img class="profile-pic-section__author-pic" :src="profilePicUser">
-                        </div>
-                        <div class="new-commentary">
-                            <textarea v-model="addNewComment" class="new-commentary__input-text" name="" placeholder="Ecrivez un commentaire..."></textarea><span><button @click="publishNewComment(publicationId)" class="button">Publier</button></span>
-                        </div>
+                    <div @click="onSharePublication()" class="share-link-publication">
+                        <img class="share-link-publication__icon" src="../assets/share-solid.svg">
+                        <p>Partager</p>
                     </div>
                 </div>
             </div>
+
+            <hr>
+
+            <div class="section-comment-publication">
+                <div class="new-comment">
+                    <div class="profile-pic-user">
+                        <img class="profile-pic-user__img" :src="profilePicUser">
+                    </div>
+                    <div class="add-new-comment">
+                        <textarea v-model="addNewComment" class="add-new-comment__input" placeholder="Ecrivez un commentaire..."></textarea>
+                        <span>
+                            <button @click="publishNewComment(publicationId)" class="button">Publier</button>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="comment" :key="index" v-for="(comment, index) in comments">
+
+                    <div class="author-comment">
+                        <div class="profile-pic-author">
+                            <img class="profile-pic-author__img" :src="comment.User.profile_pic_user">
+                        </div>
+
+                        <div class="info-comment">
+                            <div class="info-author-comment">
+                                <p class="info-author-comment__name">{{ comment.User.first_name_user }} {{ comment.User.last_name_user }}</p>
+                                <p class="info-author-comment__message">{{ comment.comment }}</p>
+                            </div>
+
+                            <div class="info-date-comment">
+                                <p class="info-date-comment__created-at">{{ comment.createdAt }}</p>
+                            </div>
+                        </div>
+
+
+
+                        <div class="delete-comment">
+                            <img class="delete-comment__icon" src="../assets/times-solid.svg" v-if="getUserIdFromLocalStorage() == comment.user_id_comment || getIsAdminFromLocalStorage() == 1" @click="deleteOneComment(comment.id)">
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+            </div>
+
         </div>
     </div>
 </template>
@@ -341,184 +359,299 @@ export default {
 
 <style scoped lang="scss">
 
-
-
-.user-commentary-container{
+.publication-card-container{
     width: 100%;
+    height: 100%;
     display: flex;
-    flex-direction: column;
-}
-
-.publication-info, .commentary-info{
-    width: 100%;
-    display: flex;
-    position: relative;
+    justify-content: center;
     align-items: center;
-    margin-bottom: 10px;
 
-    &__author-name{
-        margin-right: 20px;
-        font-weight: bold;
-    }
-
-    &__delete{
-        font-size: 22px;
-        position: absolute;
-        right: 0;
-        color: #474747;
-        font-weight: bold;
-        cursor: pointer;
-        filter: invert(35%) sepia(0%) saturate(1691%) hue-rotate(269deg) brightness(95%) contrast(76%);
-    }
-
-    &__delete:hover{
-        font-size: 25px;
-    }
-}
-
-.profile-pic-section{
-    margin-right: 12px;
-
-    &__author-pic{
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-    }        
-}
-
-.container-publications{
-    width: 80%;
-    display: flex;
-    flex-direction: column;
-
-    .publication {
-        width: 100%;
-        background: #fff;
-        border-radius: 16px;
-        margin: 25px 0 25px 0;
+    .card{
         display: flex;
         flex-direction: column;
-        
+        width: 900px;
+        background:white;
+        border-radius: 16px;
+        padding:20px;
+        margin: 15px 20px;
 
-        .container-publication{
-            margin: 50px;
+        .section-header-publication{
+            width: 100%;
             display: flex;
-            flex-direction: column;
 
-            .header-publication{
+            .author-publication{
                 display: flex;
+                justify-content: center;
                 align-items: center;
-                width: 100%;
-                margin-bottom: 25px;
-            }
+                margin-right: 10px;
 
-            .content-section{
-                width: 100%;
-                margin-bottom: 25px;
-
-                .publication-text{
-                    margin-bottom: 25px;
-
-                    &__message{
-                        text-align: left;
-                        font-size: 25px;
-                    }     
+                &__profile-pic{
+                    width: 50px;
+                    height: 50px;
+                    border-radius: 50%;
                 }
             }
 
-
-
-            .publication-file{
-                width: 100%;
-                margin-bottom: 25px;
-
-                .publication-file__image{
-                    width: 100%;
-                    border-radius: 7px;            
-                }
-            }
-
-            .commitment-section{
-                display: flex;
-                flex-wrap: wrap;
-                align-items: center;
-                margin-bottom: 15px;
-
-                .commitment-section-row{
-                    display: flex;
-                    align-items: center;
-                    cursor: pointer;
-                    margin-right: 50px;
-
-                    .container-share-publication{
-                        display: flex;
-                        align-items: center;
-
-                        img{
-                            margin-right: 5px;
-                        }
-                    }
-
-                    .container-success-share-publication{
-                        display: flex;
-                        align-items: center;
-
-                        img{
-                            margin-right: 5px;
-                            filter: invert(61%) sepia(67%) saturate(329%) hue-rotate(46deg) brightness(101%) contrast(92%);
-                        }
-                    }
-
-                    &__icon{
-                        filter: invert(18%) sepia(3%) saturate(36%) hue-rotate(328deg) brightness(91%) contrast(81%);         
-                        width: 20px;
-                        margin-right: 10px;
-                    }
-
-                }
-            }
-
-            .commentary-section{
+            .info-publication{
                 display: flex;
                 flex-direction: column;
+                flex: 1;
+
+                &__author-name{
+                    font-weight: bold;
+                }
+
+                &__date{
+                    font-size: 14px;
+                }
+            }
+
+            .delete-publication{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
+                &__icon{
+                    filter: invert(35%) sepia(0%) saturate(1691%) hue-rotate(269deg) brightness(95%) contrast(76%);
+                    cursor: pointer;
+                }
+            }
+        }
+
+        .section-content-publication{
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+
+            .message-publication{
                 width: 100%;
-                margin-top: 25px;
+                margin: 15px 0;
 
-                h2{
-                    margin-bottom: 25px;
+                &__text{
+                    font-size: 25px;
                 }
+            }
 
-                .publication-list-commentary-container{
-                    display: flex;
+            .file-publication{
+                width: 100%;
+                margin: 15px 0;
+
+                &__img{
                     width: 100%;
-                    margin-bottom: 25px;
-
                 }
+            }
+        }
+        .section-commitment-publication{
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
 
-                .new-commentary-container{
+
+            .like-and-comment-publication{
+                display: flex;
+                width: 100%;
+
+                .like-publication{
                     display: flex;
                     align-items: center;
-                    width: 100%;
+                    margin-right: 25px;
 
-                    .new-commentary{
-                        display: flex;
-                        flex-wrap: wrap;
-                        align-items: center;
+                    &__icon{
+                        width: 20px;
+                        margin-right: 10px;
+                        filter: invert(18%) sepia(3%) saturate(36%) hue-rotate(328deg) brightness(91%) contrast(81%);   
+                        cursor: pointer; 
+                    }
+                }
+
+                .counter-comment-publication{
+                    display: flex;
+                    align-items: center;
+
+                    &__icon{
+                        width: 20px;
+                        margin-right: 10px;
+                        filter: invert(18%) sepia(3%) saturate(36%) hue-rotate(328deg) brightness(91%) contrast(81%);    
+                    }
+                }
+            }
+
+            .share-publication{
+                display: flex;
+                justify-content: flex-end;
+                position: relative;
+                
+
+                .url-publication{
+                    width: 120px;
+                    position:absolute;
+                    top: -25px;
+                    cursor: pointer;
+
+                    .url-publication-hidden{
                         width: 100%;
+                        display: flex;
+                        justify-content: flex-end;
+                        border: 1px solid rgb(117, 117, 117);
+                        padding: 2px 3px;
+                        border-radius: 5px;
 
-                        &__input-text{
-                            padding-left: 10px;
-                            padding-top: 10px;
-                            display: flex;
-                            border: none;
-                            border-radius: 9px;
-                            background: #f2f2f2;
-                            font-weight: 500;
-                            font-size: 16px;
-                            flex: 1;
-                            color: black;
-                            font-family: Avenir, Helvetica, Arial, sans-serif;
+                        &__icon{
+                            width: 15px;
+                            margin-right: 10px;
+                        }
 
+                        &__text{
+                            font-size: 14px;
+                        }
+                    }
+
+                    .url-publication-show{
+                        width: 100%;
+                        display: flex;
+                        justify-content: flex-end;
+
+                        &__icon{
+                            filter: invert(61%) sepia(67%) saturate(329%) hue-rotate(46deg) brightness(101%) contrast(92%);       
+                            width: 15px;
+                            margin-right: 10px;
+                        }
+
+                        &____msg-success-copy{
+                            font-size: 14px;
+                        }
+                    }
+                }
+
+                .share-link-publication{
+                    width: 100%;
+                    display: flex;
+                    justify-content: center;
+                    cursor: pointer;
+
+                    &__icon{
+                        width: 20px;
+                        margin-right: 10px;
+                        filter: invert(18%) sepia(3%) saturate(36%) hue-rotate(328deg) brightness(91%) contrast(81%);   
+
+                    }
+                }
+            }
+        }
+
+        .section-comment-publication{
+            width: 100%;
+
+
+            .new-comment{
+                width: 100%;
+                display: flex;
+                align-items: center;
+                margin-top: 20px;
+
+                .profile-pic-user{
+                    width: 50px;
+                    margin-right: 5px;
+
+                    &__img{
+                        width: 50px;
+                        height: 50px;
+                        border-radius: 50%;
+                    }
+                }
+
+                .add-new-comment{
+                    width: 100%;
+                    display: flex;
+                    align-items: center;
+
+                    &__input{
+                        width: 100%;
+                        height: 50px;
+                        padding: 15px 0;
+                        padding-left: 10px;
+                        font-size: 15px;
+                        border: none;
+                        border-radius: 9px;
+                        background: #f2f2f2;
+                        font-weight: 500;
+                        color: black;
+                        font-family: Avenir, Helvetica, Arial, sans-serif;
+                    }
+                }
+            }
+
+            .comment{
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                margin: 20px 0;
+
+                .author-comment{
+                    display: flex;
+                    position: relative;
+
+
+                    .profile-pic-author{
+                        width: 50px;
+                        margin-right: 5px;
+
+                        &__img{
+                            width: 50px;
+                            height: 50px;
+                            border-radius: 50%;
+                        }
+                    }
+
+                    .info-comment{
+                        width: 100%;
+                        display: flex;
+                        flex-direction: column;
+
+
+                        .info-author-comment{
+                            width: 100%;
+                            background: rgb(236, 236, 236);
+                            border-radius: 15px;
+                            padding: 8px;
+
+                            &__name{
+                                font-weight: bold;
+                                margin-right: 10px;
+                            }
+
+                            &__message{
+
+                            }
+                        }
+
+                        .info-date-comment{
+
+                            &__created-at{
+                                font-size: 12px;
+                            }
+                        }
+
+ 
+                        &__date{
+                            font-size: 12px;
+                        }
+                    }
+
+                    .delete-comment{
+                        position: absolute;
+                        right: -4px;
+                        top: -7px;
+                        width: 15px;
+                        margin-left: 10px;
+                        cursor: pointer;
+
+
+                        &__icon{
+                            width: 100%;
+                            filter: invert(35%) sepia(0%) saturate(1691%) hue-rotate(269deg) brightness(95%) contrast(76%);
                         }
                     }
                 }

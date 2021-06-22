@@ -1,22 +1,25 @@
 <template>
-    <div class="card">
-    <h2 class="card__title">Exprimez-vous :</h2>
-    <form class="form-publication" @submit.prevent="createNewPublication" enctype="multipart/form-data">
-        <div v-if="imageTempUrl != null " @click="cancelPrevImage" class="div-image-preview">
-            <img :src="imageTempUrl" class="div-image-preview__image-preview" alt="Médias">       
-        </div>            
-        <div class="form-group">
-            <textarea v-model="message" class="form-group__message-input" rows="5" maxlength="255" placeholder="Ajouter un texte ..."></textarea>
+    <div class="form-publication-container">
+        <div class="card">
+            <h2 class="card__title">Exprimez-vous :</h2>
+            <form class="form-publication" @submit.prevent="createNewPublication" enctype="multipart/form-data">
+                <div v-if="imageTempUrl != null " @click="cancelPrevImage" class="div-image-preview">
+                    <img :src="imageTempUrl" class="div-image-preview__image-preview" alt="Médias">       
+                </div>            
+                <div class="form-group">
+                    <textarea v-model="message" class="form-group__message-input" rows="5" maxlength="255" placeholder="Ajouter un texte ..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="inputUploadImg"><img class="form-group__icon icon" src="../assets/file-image-regular.svg"></label>
+                    <input @change="previewImage" id="inputUploadImg" class="form-group__file-upload" type="file" name="file" ref="fileInput">  
+                </div>
+                <div class="row-btn">
+                    <button class="button">Publier</button>
+                </div>
+            </form>
         </div>
-        <div class="form-group">
-            <label for="inputUploadImg"><img class="form-group__icon icon" src="../assets/file-image-regular.svg"></label>
-            <input @change="previewImage" id="inputUploadImg" class="form-group__file-upload" type="file" name="file" ref="fileInput">  
-        </div>
-        <div class="row-btn">
-            <button class="button">Publier</button>
-        </div>
-    </form>
-  </div>
+    </div>
+
 
 </template>
 
@@ -105,95 +108,106 @@ export default {
 
 <style scoped lang="scss">
 
-.card {
-    max-width: 100%;
-    width: 900px;
-    background:white;
-    border-radius: 16px;
-    padding:30px 20px;
-    margin-top: 25px;
-    margin-bottom: 25px;
+.form-publication-container{
+    width: 100%;
+    height: 100%;
     display: flex;
-    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 
-    &__title {
-        text-align: left;
-        font-weight: 800;
-        margin-bottom: 20px;
-    }
+    .card {
+        display: flex;
+        flex-direction: column;
+        width: 900px;
+        height: 100%;
+        background:white;
+        border-radius: 16px;
+        padding:25px;
+        margin: 50px 20px;
 
-    .form-publication{
-
-        .div-image-preview{
-            margin-top: 20px; 
-            margin-bottom: 20px; 
-            width: 25%;
-            position: relative;
-            display: flex;
-
-            &__image-preview{
-                width: 100%;
-                border-radius: 15px;
-                z-index: 1;
-            }            
+        &__title {
+            text-align: left;
+            font-weight: 800;
+            margin-bottom: 20px;
         }
 
-        .div-image-preview::before{
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10;
-            content:'X';
-            color: white;
-            background: rgba(0, 0, 0, 0.788);
-            border-radius: 50%;
-            padding: 3px;
-            width: 25px;
-            height: 25px;
-            font-weight: bold;
-            position: absolute;
-            left: 5px;
-            top: 5px;
-            cursor: pointer;
-        }
+        .form-publication{
 
-        .form-group{
-            display: flex;
-            margin: 20px 0 20px 0;
+            .div-image-preview{
+                margin-top: 20px; 
+                margin-bottom: 20px; 
+                width: 25%;
+                position: relative;
+                display: flex;
 
-            &__file-upload{
-                display: none;
-            }       
-                 
-            &__icon{
-                width: 20px;
-                filter: invert(18%) sepia(3%) saturate(36%) hue-rotate(328deg) brightness(91%) contrast(81%);
-                cursor:pointer;     
+                &__image-preview{
+                    width: 100%;
+                    border-radius: 15px;
+                    z-index: 1;
+                }            
             }
 
-            &__icon:hover{
-                filter: invert(35%) sepia(100%) saturate(841%) hue-rotate(182deg) brightness(93%) contrast(99%);
+            .div-image-preview::before{
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10;
+                content:'X';
+                color: white;
+                background: rgba(0, 0, 0, 0.788);
+                border-radius: 50%;
+                padding: 3px;
+                width: 25px;
+                height: 25px;
+                font-weight: bold;
+                position: absolute;
+                left: 5px;
+                top: 5px;
+                cursor: pointer;
             }
 
-            &__message-input{
-                padding: 18px;
-                border: none;
-                border-radius: 9px;
-                background: #f2f2f2;
-                font-weight: 500;
-                font-size: 16px;
-                flex: 1;
-                min-width: 100px;
-                color: black;
-                font-family: Avenir, Helvetica, Arial, sans-serif;
-            }            
-        }
+            .form-group{
+                display: flex;
+                margin: 20px 0 20px 0;
 
-        .row-btn{
-            margin-top: 20px;
+                &__file-upload{
+                    display: none;
+                }       
+                    
+                &__icon{
+                    width: 20px;
+                    filter: invert(18%) sepia(3%) saturate(36%) hue-rotate(328deg) brightness(91%) contrast(81%);
+                    cursor:pointer;     
+                }
+
+                &__icon:hover{
+                    filter: invert(35%) sepia(100%) saturate(841%) hue-rotate(182deg) brightness(93%) contrast(99%);
+                }
+
+                &__message-input{
+                    padding: 18px;
+                    border: none;
+                    border-radius: 9px;
+                    background: #f2f2f2;
+                    font-weight: 500;
+                    font-size: 16px;
+                    flex: 1;
+                    min-width: 100px;
+                    color: black;
+                    font-family: Avenir, Helvetica, Arial, sans-serif;
+                }            
+            }
+
+            .row-btn{
+                margin-top: 20px;
+            }
         }
     }
+
 }
+
+
+
 
 
 </style>

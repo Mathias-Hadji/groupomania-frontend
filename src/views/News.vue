@@ -69,11 +69,7 @@ export default {
 }
 </script>
 
-<style scoped>
-.news{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
+<style scoped lang="scss">
+
 
 </style>

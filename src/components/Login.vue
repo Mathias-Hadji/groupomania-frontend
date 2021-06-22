@@ -1,5 +1,5 @@
 <template>
-    <div class="main-container">
+    <div class="login-container">
         <div class="card">
             <h1 class="card__title"> Se connecter</h1>
             <p class="card__subtitle">Vous n'avez pas encore de compte ? <span class="card__action" @click=switchToCreateAccount>Créer un compte</span></p>
@@ -24,8 +24,6 @@
 </template>
 
 <script>
-// @ is an alias to /src
-// import HelloWorld from '@/components/HelloWorld.vue'
 
 import axios from 'axios';
 export default {
@@ -89,9 +87,8 @@ export default {
                     this.setTokenFromLocalStorage(response.data.token);
                     this.setUserIdFromLocalStorage(response.data.userId);
                     this.setIsAdminFromLocalStorage(response.data.isAdmin);
-                    
-
-                    this.$store.state.modeFromVueX = 'connected';
+                
+                    window.location.href = 'http://localhost:8080/news';
                     
                 })
                 .catch(error => {
@@ -115,47 +112,20 @@ export default {
 
 <style scoped lang="scss">
 
-.main-container{
+.login-container{
     width: 100%;
     height: 100%;
     display: flex;
-    flex-direction: column;
+    justify-content: center;
     align-items: center;
 
-    .nav {
-        width: 100%;
-        height: 100px;
-        padding: 30px;
-        display: flex;
-        background: #fff;
-
-        .container-elt{
-            display: flex;
-            align-items: center;
-
-            #logo {
-                height: 30px;
-            }
-        }
-    }
-
     .card {
-        margin-top: 150px;
-        max-width: 100%;
         width: 540px;
+        height: 100%;
         background:white;
         border-radius: 16px;
         padding:32px;
-
-        .card-logo-container{
-
-            width: 100%;
-            display: flex;
-            align-items: center;
-            flex-direction: column;
-            height: 50px;
-        }
-
+        margin: 75px 20px;
 
         &__title {
             text-align:center;
@@ -198,7 +168,6 @@ export default {
             }    
         }
     }
-
 }
 
 
