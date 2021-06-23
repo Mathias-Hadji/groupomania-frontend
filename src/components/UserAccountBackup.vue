@@ -288,7 +288,6 @@ export default {
 .card{
     display: flex;
     flex-direction: column;
-    max-width: 100%;
     width: 80%;
     background: #FFF;
     border-radius: 16px;

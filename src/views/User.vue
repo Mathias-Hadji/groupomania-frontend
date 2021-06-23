@@ -1,16 +1,16 @@
 <template>
     <div class="profile">
-        <UserAccount />
+        <SettingsUserCard />
     </div>
 </template>
 
 <script>
-import UserAccount from '@/components/UserAccount.vue'
+import SettingsUserCard from '@/components/SettingsUserCard.vue'
 
 export default {
-    name: 'Profile',
+    name: 'User',
     components: {
-        UserAccount,
+        SettingsUserCard,
     }
 }
 </script>

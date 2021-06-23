@@ -14,18 +14,15 @@
                     <img class="delete-publication__icon" width="15" src="../assets/times-solid.svg" v-if="getUserIdFromLocalStorage() == publicationData.user_id_publication || getIsAdminFromLocalStorage() == 1" @click="deletePublication()">
                 </div>  
             </div> 
-
             <div class="section-content-publication">
                 <div class="message-publication">
                     <p class="message-publication__text"> {{ publicationData.message_publication }}</p>
                 </div>
 
-                <div class="file-publication">
-                    <img v-if="publicationData.image_publication != ''" class="file-publication__img" :src="publicationData.image_publication">
+                <div v-if="publicationData.image_publication !== null" class="file-publication">
+                    <img class="file-publication__img" :src="publicationData.image_publication">
                 </div>
             </div>
-
-
             <div class="section-commitment-publication">
 
                 <div class="like-and-comment-publication">
@@ -39,9 +36,6 @@
                         <img class="counter-comment-publication__icon" src="../assets/comment-solid.svg"><span>{{ comments.length }}</span>
                     </div>
                 </div>
-
-
-
 
                 <div class="share-publication">
                     <div v-if="showUrlPublication == true" class="url-publication">
@@ -94,19 +88,12 @@
                             </div>
                         </div>
 
-
-
                         <div class="delete-comment">
                             <img class="delete-comment__icon" src="../assets/times-solid.svg" v-if="getUserIdFromLocalStorage() == comment.user_id_comment || getIsAdminFromLocalStorage() == 1" @click="deleteOneComment(comment.id)">
                         </div>
                     </div>
                 </div>
-
-
-
-
             </div>
-
         </div>
     </div>
 </template>
@@ -273,7 +260,7 @@ export default {
         publishNewComment(){
 
             axios.post(`http://localhost:3000/api/comment/publication/${this.publicationId}`, 
-            { comment : this.addNewComment},
+            { comment : this.addNewComment },
             { headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage() }`}})
             .then(res => {
                 console.log(res)
@@ -332,12 +319,6 @@ export default {
                 this.profilePicUser = response.data.profile_pic_user
             })
             .catch(error => console.log(error.response))
-        },
-
-
-
-        replaceSymbol(message){
-            return message.split('&apos;').join("'")
         },
 
 
@@ -438,6 +419,7 @@ export default {
 
                 &__img{
                     width: 100%;
+                    border-radius: 10px;
                 }
             }
         }
@@ -621,10 +603,6 @@ export default {
                                 font-weight: bold;
                                 margin-right: 10px;
                             }
-
-                            &__message{
-
-                            }
                         }
 
                         .info-date-comment{
@@ -634,7 +612,6 @@ export default {
                             }
                         }
 
- 
                         &__date{
                             font-size: 12px;
                         }
@@ -643,7 +620,7 @@ export default {
                     .delete-comment{
                         position: absolute;
                         right: -4px;
-                        top: -7px;
+                        top: -9px;
                         width: 15px;
                         margin-left: 10px;
                         cursor: pointer;
