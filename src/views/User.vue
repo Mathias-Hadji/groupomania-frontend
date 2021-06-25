@@ -1,7 +1,7 @@
 <template>
-    <div class="profile">
+    <main class="profile">
         <SettingsUserCard />
-    </div>
+    </main>
 </template>
 
 <script>

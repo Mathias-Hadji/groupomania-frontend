@@ -1,5 +1,5 @@
 <template>
-    <div class="form-publication-container">
+    <section class="form-publication-container">
         <div class="card">
             <h2 class="card__title">Exprimez-vous :</h2>
             <form class="form-publication" @submit.prevent="createNewPublication" enctype="multipart/form-data">
@@ -18,7 +18,7 @@
                 </div>
             </form>
         </div>
-    </div>
+    </section>
 
 
 </template>

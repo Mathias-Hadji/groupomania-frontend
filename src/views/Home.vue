@@ -1,13 +1,11 @@
 <template>
-    <div class="home">
+    <main class="home">
         <Login v-if="mode == 'login'"/>
         <Registration v-else/>
-    </div>
+    </main>
 </template>
 <script>
 
-// @ is an alias to /src
-// import HelloWorld from '@/components/HelloWorld.vue'
 
 import Registration from '@/components/Registration.vue'
 import Login from '@/components/Login.vue'

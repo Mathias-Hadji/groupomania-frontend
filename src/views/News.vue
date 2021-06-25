@@ -1,5 +1,5 @@
 <template>
-    <div class="news">
+    <main class="news">
 
         <FormPublication
             v-on:updateListOfPublications="getAllPublications()"
@@ -11,7 +11,7 @@
             v-bind:publicationId="publication.id"
             v-on:updateListOfPublications="getAllPublications()"
         />
-    </div>
+    </main>
 </template>
 
 

@@ -1,20 +1,18 @@
 <template>
     <div class="settings-user-card-container">
         <div class="card">
-            <div class="username">
+            <header class="username">
                 <h1 class="username__title">{{ firstNameUser }} {{ lastNameUser }}</h1>
-            </div>
+            </header>
 
-            <div class="row">
-                <div class="section-profile-pic">
+            <section class="row">
+                <section class="section-profile-pic">
                     <h2 class="section-profile-pic__title">Photo de profil</h2>
 
                     <div class="container-profile-pic">
-                        <img v-if="imageTempUrl == null" class="container-profile-pic__pic" :src="profilePicUser" alt="">
-                        <img v-else class="container-profile-pic__pic" :src="imageTempUrl"> 
+                        <img v-if="imageTempUrl == null" class="container-profile-pic__pic" :src="profilePicUser" alt="image de profil">
+                        <img v-else class="container-profile-pic__pic" :src="imageTempUrl" alt="image de profil"> 
                     </div>
-
-
 
                     <label v-if="validBtnProfilePic == false" class="section-profile-pic__label" for="profilePic">Modifier</label>
                     <input @change="previewImage" id="profilePic" class="section-profile-pic__input" type="file" name="profilePic">
@@ -25,9 +23,9 @@
                     </div>
                     <p v-if="successMsgProfilePic != null" class="section-profile-pic__success-message text-success">{{ successMsgProfilePic }}</p> 
                     <p v-if="errorMsgProfilePic != null" class="section-profile-pic__error-message text-danger">{{ errorMsgProfilePic }}</p>
-                </div>
+                </section>
 
-                <div class="section-user-information">
+                <section class="section-user-information">
                     <div div class="user-information">
                         <h2 class="user-information__title">Email</h2>
                         <p>{{ userEmail }}</p>
@@ -40,31 +38,32 @@
                         <p v-if="successMsgBio != null" class="user-bio__success-message text-success">{{ successMsgBio }}</p> 
                         <p v-if="errorMsgBio != null" class="user-bio__error-message text-danger">{{ errorMsgBio }}</p>   
                     </div>
-                </div>
-            </div>
+                </section>
+            </section>
 
             <hr>
 
-            <div class="row">
-                <div class="div-update-password">
-                    <h2 class="div-update-password__title">Modifier mon mot de passe</h2>
-                    <div class="div-password">
-                        <label class="div-password__label" for="current-password">Mot de passe actuel :</label>
-                        <input v-model="inputUserCurrentPassword" class="div-password__input" type="password" name="current-password" required>
+            <section class="row">
+                <section class="section-update-password">
+                    <h2 class="section-update-password__title">Modifier mon mot de passe</h2>
+                    <div class="update-password">
+                        <label class="update-password__label" for="current-password">Mot de passe actuel :</label>
+                        <input v-model="inputUserCurrentPassword" class="update-password__input" type="password" name="current-password" required>
                     </div>
-                    <div class="div-password">
-                        <label class="div-password__label" for="new-password">Nouveau mot de passe :</label>
-                        <input v-model="inputUserNewPassword" class="div-password__input" type="password" name="new-password" required>
+                    <div class="update-password">
+                        <label class="update-password__label" for="new-password">Nouveau mot de passe :</label>
+                        <input v-model="inputUserNewPassword" class="update-password__input" type="password" name="new-password" required>
                         <button @click="modifyPassword" v-bind:disabled="btnDisabled == true" v-bind:class="{'button--disabled' : btnDisabled}" class="button">Valider</button>
-                        <p v-if="errorMsgCurrentPassword != null" class="div-password__error-message text-danger">{{ errorMsgCurrentPassword }}</p>
-                        <p v-if="successMsgPassword != null" class="div-password__success-message text-success">{{ successMsgPassword }}</p>
+                        <p v-if="errorMsgCurrentPassword != null" class="update-password__error-message text-danger">{{ errorMsgCurrentPassword }}</p>
+                        <p v-if="successMsgPassword != null" class="update-password__success-message text-success">{{ successMsgPassword }}</p>
                     </div>
-                </div>
-                <div class="div-delete-account">
-                    <h2 class="div-delete-account__title">Supprimer mon compte</h2>
+                </section>
+
+                <section class="section-delete-account">
+                    <h2 class="section-delete-account__title">Supprimer mon compte</h2>
                     <button @click="deleteAccount" class="button">Supprimer</button>
-                </div>
-            </div>
+                </section>
+            </section>
         </div>
     </div>
 
@@ -451,7 +450,7 @@ export default {
 
             }
             
-            .div-update-password{
+            .section-update-password{
                 display: flex;
                 flex-direction: column;
                 margin-bottom: 50px;
@@ -461,7 +460,7 @@ export default {
                     margin-bottom: 20px;
                 }
 
-                .div-password{
+                .update-password{
                     display: flex;
                     flex-direction: column;
                     text-align: left;
@@ -493,7 +492,7 @@ export default {
                 }
             }
 
-            .div-delete-account{
+            .section-delete-account{
                 padding: 0 20px;
 
                 &__title{

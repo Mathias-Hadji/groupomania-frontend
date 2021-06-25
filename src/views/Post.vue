@@ -1,9 +1,9 @@
 <template>
-    <div>
+    <main>
         <PublicationCard
             v-bind:publicationId = getIdPublicationFromUrl()
         />
-    </div>
+    </main>
 
 </template>
 

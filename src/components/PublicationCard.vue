@@ -1,66 +1,71 @@
 <template>
-    <div class="publication-card-container">
+    <article class="publication-card-container">
         <div class="card">
+            <div class="main-container">
 
-            <div class="section-header-publication">
-                <div class="author-publication">
-                    <img class="author-publication__profile-pic" :src="authorPublicationData.profile_pic_user">
-                </div>
-                <div class="info-publication">
-                    <p class="info-publication__author-name"> {{ authorPublicationData.first_name_user }} {{ authorPublicationData.last_name_user }}</p>
-                    <p class="info-publication__date">{{ publicationData.createdAt }}</p>
-                </div>        
-                <div class="delete-publication">
-                    <img class="delete-publication__icon" width="15" src="../assets/times-solid.svg" v-if="getUserIdFromLocalStorage() == publicationData.user_id_publication || getIsAdminFromLocalStorage() == 1" @click="deletePublication()">
-                </div>  
-            </div> 
-            <div class="section-content-publication">
-                <div class="message-publication">
-                    <p class="message-publication__text"> {{ publicationData.message_publication }}</p>
-                </div>
-
-                <div v-if="publicationData.image_publication !== null" class="file-publication">
-                    <img class="file-publication__img" :src="publicationData.image_publication">
-                </div>
-            </div>
-            <div class="section-commitment-publication">
-
-                <div class="like-and-comment-publication">
-                    <div class="like-publication">
-                        <img v-if="arrayPublicationLikedByUser && arrayPublicationLikedByUser.includes(publicationId)" @click="onLikePublication()" class="like-publication__icon" src="../assets/heart-solid.svg">
-                        <img v-else @click="onLikePublication()" class="like-publication__icon" src="../assets/heart-regular.svg">
-                        <p class="like-publication__counter">{{ likesPublication.length }}</p>
+                <section class="section-author-pic">
+                    <div class="author-publication">
+                        <img class="author-publication__profile-pic" :src="authorPublicationData.profile_pic_user" alt="image de profil">
                     </div>
+                </section>
 
-                    <div class="counter-comment-publication">
-                        <img class="counter-comment-publication__icon" src="../assets/comment-solid.svg"><span>{{ comments.length }}</span>
+                <section class="section-content">
+                    <div class="container-content">
+                        <header class="section-header-publication">
+                            <div class="info-publication">
+                                <p class="info-publication__author-name"> {{ authorPublicationData.first_name_user }} {{ authorPublicationData.last_name_user }}</p>
+                                <p class="info-publication__date">{{ publicationData.createdAt }}</p>
+                            </div>        
+                            <div class="delete-publication">
+                                <img class="delete-publication__icon" width="15" src="../assets/times-solid.svg" v-if="getUserIdFromLocalStorage() == publicationData.user_id_publication || getIsAdminFromLocalStorage() == 1" @click="deletePublication()" alt="bouton supprimer">
+                            </div>  
+                        </header> 
+                        <section class="content-publication">
+                            <div class="message-publication">
+                                <p class="message-publication__text"> {{ publicationData.message_publication }}</p>
+                            </div>
+                            <div v-if="publicationData.image_publication !== null" class="file-publication">
+                                <img class="file-publication__img" :src="publicationData.image_publication" alt="image de publication">
+                            </div>
+                        </section>
                     </div>
-                </div>
+                    <section class="section-commitment-publication">
+                        <div class="like-and-comment-publication">
+                            <div class="like-publication">
+                                <img v-if="arrayPublicationLikedByUser && arrayPublicationLikedByUser.includes(publicationId)" @click="onLikePublication()" class="like-publication__icon" src="../assets/heart-solid.svg" alt="bouton like">
+                                <img v-else @click="onLikePublication()" class="like-publication__icon" src="../assets/heart-regular.svg" alt="bouton like">
+                                <p class="like-publication__counter">{{ likesPublication.length }}</p>
+                            </div>
 
-                <div class="share-publication">
-                    <div v-if="showUrlPublication == true" class="url-publication">
-                        <div v-if="shareLinkIsClicked == false" class="url-publication-hidden">
-                            <img @click="copyText()" class="url-publication-hidden__icon" src="../assets/copy-regular.svg">
-                            <p @click="copyText()" class="url-publication-hidden__text">Copier le lien</p>
+                            <div class="counter-comment-publication">
+                                <img class="counter-comment-publication__icon" src="../assets/comment-solid.svg" alt="icone commentaire"><span>{{ comments.length }}</span>
+                            </div>
                         </div>
-                        <div v-else class="url-publication-show">
-                            <img class="url-publication-show__icon" src="../assets/check-solid.svg">
-                            <p class="url-publication-show__msg-success-copy">Copié !</p>
+
+                        <div class="share-publication">
+                            <div v-if="showUrlPublication == true" class="url-publication">
+                                <div v-if="shareLinkIsClicked == false" class="url-publication-hidden">
+                                    <img @click="copyText()" class="url-publication-hidden__icon" src="../assets/copy-regular.svg" alt="icone copie">
+                                    <p @click="copyText()" class="url-publication-hidden__text">Copier le lien</p>
+                                </div>
+                                <div v-else class="url-publication-show">
+                                    <img class="url-publication-show__icon" src="../assets/check-solid.svg" alt="icone valider">
+                                    <p class="url-publication-show__msg-success-copy">Copié !</p>
+                                </div>
+                            </div>
+                            <div @click="onSharePublication()" class="share-link-publication">
+                                <img class="share-link-publication__icon" src="../assets/share-solid.svg" alt="icone partager">
+                            </div>
                         </div>
-                    </div>
-                    <div @click="onSharePublication()" class="share-link-publication">
-                        <img class="share-link-publication__icon" src="../assets/share-solid.svg">
-                        <p>Partager</p>
-                    </div>
-                </div>
+                    </section>
+                <hr>
+                </section>
             </div>
 
-            <hr>
-
-            <div class="section-comment-publication">
+            <section class="section-comment-publication">
                 <div class="new-comment">
                     <div class="profile-pic-user">
-                        <img class="profile-pic-user__img" :src="profilePicUser">
+                        <img class="profile-pic-user__img" :src="profilePicUser" alt="image de profil">
                     </div>
                     <div class="add-new-comment">
                         <textarea v-model="addNewComment" class="add-new-comment__input" placeholder="Ecrivez un commentaire..."></textarea>
@@ -74,7 +79,7 @@
 
                     <div class="author-comment">
                         <div class="profile-pic-author">
-                            <img class="profile-pic-author__img" :src="comment.User.profile_pic_user">
+                            <img class="profile-pic-author__img" :src="comment.User.profile_pic_user" alt="auteur de la publication">
                         </div>
 
                         <div class="info-comment">
@@ -89,13 +94,13 @@
                         </div>
 
                         <div class="delete-comment">
-                            <img class="delete-comment__icon" src="../assets/times-solid.svg" v-if="getUserIdFromLocalStorage() == comment.user_id_comment || getIsAdminFromLocalStorage() == 1" @click="deleteOneComment(comment.id)">
+                            <img class="delete-comment__icon" src="../assets/times-solid.svg" alt="icone supprimer" v-if="getUserIdFromLocalStorage() == comment.user_id_comment || getIsAdminFromLocalStorage() == 1" @click="deleteOneComment(comment.id)">
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
         </div>
-    </div>
+    </article>
 </template>
 
 <script>
@@ -356,172 +361,202 @@ export default {
         padding:20px;
         margin: 15px 20px;
 
-        .section-header-publication{
+        .main-container{
             width: 100%;
             display: flex;
 
-            .author-publication{
+            .section-author-pic{
+                width: auto;
                 display: flex;
-                justify-content: center;
-                align-items: center;
-                margin-right: 10px;
 
-                &__profile-pic{
-                    width: 50px;
-                    height: 50px;
-                    border-radius: 50%;
+                .author-publication{
+                    display: flex;
+                    margin-right: 10px;
+
+                    &__profile-pic{
+                        width: 50px;
+                        height: 50px;
+                        border-radius: 50%;
+                    }
                 }
             }
 
-            .info-publication{
+            .section-content{
+                width: 100%;
                 display: flex;
                 flex-direction: column;
-                flex: 1;
 
-                &__author-name{
-                    font-weight: bold;
-                }
-
-                &__date{
-                    font-size: 14px;
-                }
-            }
-
-            .delete-publication{
-                display: flex;
-                justify-content: center;
-                align-items: center;
-
-                &__icon{
-                    filter: invert(35%) sepia(0%) saturate(1691%) hue-rotate(269deg) brightness(95%) contrast(76%);
-                    cursor: pointer;
-                }
-            }
-        }
-
-        .section-content-publication{
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-
-            .message-publication{
-                width: 100%;
-                margin: 15px 0;
-
-                &__text{
-                    font-size: 25px;
-                }
-            }
-
-            .file-publication{
-                width: 100%;
-                margin: 15px 0;
-
-                &__img{
+                .container-content{
+                    display: flex;
+                    flex-direction: column;
                     width: 100%;
-                    border-radius: 10px;
-                }
-            }
-        }
-        .section-commitment-publication{
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 10px 0;
 
-
-            .like-and-comment-publication{
-                display: flex;
-                width: 100%;
-
-                .like-publication{
-                    display: flex;
-                    align-items: center;
-                    margin-right: 25px;
-
-                    &__icon{
-                        width: 20px;
-                        margin-right: 10px;
-                        filter: invert(18%) sepia(3%) saturate(36%) hue-rotate(328deg) brightness(91%) contrast(81%);   
-                        cursor: pointer; 
-                    }
-                }
-
-                .counter-comment-publication{
-                    display: flex;
-                    align-items: center;
-
-                    &__icon{
-                        width: 20px;
-                        margin-right: 10px;
-                        filter: invert(18%) sepia(3%) saturate(36%) hue-rotate(328deg) brightness(91%) contrast(81%);    
-                    }
-                }
-            }
-
-            .share-publication{
-                display: flex;
-                justify-content: flex-end;
-                position: relative;
-                
-
-                .url-publication{
-                    width: 120px;
-                    position:absolute;
-                    top: -25px;
-                    cursor: pointer;
-
-                    .url-publication-hidden{
+                    .section-header-publication{
                         width: 100%;
                         display: flex;
-                        justify-content: flex-end;
-                        border: 1px solid rgb(117, 117, 117);
-                        padding: 2px 3px;
-                        border-radius: 5px;
 
-                        &__icon{
-                            width: 15px;
-                            margin-right: 10px;
+
+                        .info-publication{
+                            display: flex;
+                            flex-direction: column;
+                            flex: 1;
+
+                            &__author-name{
+                                font-weight: bold;
+                            }
+
+                            &__date{
+                                font-size: 14px;
+                            }
                         }
 
-                        &__text{
-                            font-size: 14px;
+                        .delete-publication{
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+
+                            &__icon{
+                                filter: invert(35%) sepia(0%) saturate(1691%) hue-rotate(269deg) brightness(95%) contrast(76%);
+                                cursor: pointer;
+                            }
                         }
                     }
 
-                    .url-publication-show{
-                        width: 100%;
+                    .content-publication{
                         display: flex;
-                        justify-content: flex-end;
+                        flex-direction: column;
+                        width: 100%;
 
-                        &__icon{
-                            filter: invert(61%) sepia(67%) saturate(329%) hue-rotate(46deg) brightness(101%) contrast(92%);       
-                            width: 15px;
-                            margin-right: 10px;
+                        .message-publication{
+                            width: 100%;
+                            margin: 15px 0;
+
+                            &__text{
+                                font-size: 20px;
+                            }
                         }
 
-                        &____msg-success-copy{
-                            font-size: 14px;
+                        .file-publication{
+                            width: 100%;
+                            margin: 15px 0;
+
+                            &__img{
+                                width: 100%;
+                                border-radius: 10px;
+                            }
                         }
                     }
                 }
 
-                .share-link-publication{
+                .section-commitment-publication{
                     width: 100%;
                     display: flex;
-                    justify-content: center;
-                    cursor: pointer;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin: 10px 0;
 
-                    &__icon{
-                        width: 20px;
-                        margin-right: 10px;
-                        filter: invert(18%) sepia(3%) saturate(36%) hue-rotate(328deg) brightness(91%) contrast(81%);   
 
+                    .like-and-comment-publication{
+                        display: flex;
+                        width: 100%;
+
+                        .like-publication{
+                            display: flex;
+                            align-items: center;
+                            margin-right: 25px;
+
+                            &__icon{
+                                width: 20px;
+                                margin-right: 10px;
+                                filter: invert(18%) sepia(3%) saturate(36%) hue-rotate(328deg) brightness(91%) contrast(81%);   
+                                cursor: pointer; 
+                            }
+                        }
+
+                        .counter-comment-publication{
+                            display: flex;
+                            align-items: center;
+
+                            &__icon{
+                                width: 20px;
+                                margin-right: 10px;
+                                filter: invert(18%) sepia(3%) saturate(36%) hue-rotate(328deg) brightness(91%) contrast(81%);    
+                            }
+                        }
+                    }
+
+                    .share-publication{
+                        display: flex;
+                        justify-content: flex-end;
+                        position: relative;
+                        
+
+                        .url-publication{
+                            width: 120px;
+                            position:absolute;
+                            top: -25px;
+                            cursor: pointer;
+
+                            .url-publication-hidden{
+                                width: 100%;
+                                display: flex;
+                                justify-content: flex-end;
+                                border: 1px solid rgb(117, 117, 117);
+                                padding: 2px 3px;
+                                border-radius: 5px;
+
+                                &__icon{
+                                    width: 15px;
+                                    margin-right: 10px;
+                                }
+
+                                &__text{
+                                    font-size: 14px;
+                                }
+                            }
+
+                            .url-publication-show{
+                                width: 100%;
+                                display: flex;
+                                justify-content: flex-end;
+
+                                &__icon{
+                                    filter: invert(61%) sepia(67%) saturate(329%) hue-rotate(46deg) brightness(101%) contrast(92%);       
+                                    width: 15px;
+                                    margin-right: 10px;
+                                }
+
+                                &____msg-success-copy{
+                                    font-size: 14px;
+                                }
+                            }
+                        }
+
+                        .share-link-publication{
+                            width: 100%;
+                            display: flex;
+                            justify-content: center;
+                            cursor: pointer;
+
+                            &__icon{
+                                width: 20px;
+                                margin-right: 10px;
+                                filter: invert(18%) sepia(3%) saturate(36%) hue-rotate(328deg) brightness(91%) contrast(81%);   
+
+                            }
+                        }
                     }
                 }
             }
+
+
+
+
         }
+
+
+
+
 
         .section-comment-publication{
             width: 100%;
