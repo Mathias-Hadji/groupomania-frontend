@@ -339,7 +339,6 @@ export default {
             return JSON.parse(localStorage.getItem('groupomania_isAdmin'))
         },    
     },
-
 }
 </script>
 
@@ -548,19 +547,10 @@ export default {
                     }
                 }
             }
-
-
-
-
         }
-
-
-
-
 
         .section-comment-publication{
             width: 100%;
-
 
             .new-comment{
                 width: 100%;

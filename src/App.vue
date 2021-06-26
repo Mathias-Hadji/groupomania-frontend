@@ -1,17 +1,20 @@
 <template>
     <div>
-        <!--<HeaderNav/>-->
+        <nav class="main-navbar">
+            <HeaderNav/>
+        </nav>
+
         <router-view/>
     </div>
 </template>
 
 
 <script>
-//import HeaderNav from '@/components/HeaderNav.vue'
+import HeaderNav from '@/components/HeaderNav.vue'
 
 export default {
     components: {
-        //HeaderNav,
+        HeaderNav,
     },
 
     computed: {
@@ -24,6 +27,7 @@ export default {
 
 
 <style lang="scss">
+
 *{
     margin:0;
     padding: 0;
@@ -36,6 +40,10 @@ export default {
     color: #2c3e50;
     background-image: linear-gradient(62deg, #7e91fb 0%, #6876f7 100%);
     min-height: 100vh;
+}
+
+.main-navbar{
+    padding-bottom: 50px;
 }
 
 .button {

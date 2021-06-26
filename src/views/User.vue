@@ -1,5 +1,5 @@
 <template>
-    <main class="profile">
+    <main class="user">
         <SettingsUserCard />
     </main>
 </template>
@@ -16,7 +16,7 @@ export default {
 </script>
 
 <style scoped>
-    .profile{
+    .user{
         display: flex;
         flex-direction: column;
         width: 100%;

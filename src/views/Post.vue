@@ -1,5 +1,5 @@
 <template>
-    <main>
+    <main class="post">
         <PublicationCard
             v-bind:publicationId = getIdPublicationFromUrl()
         />

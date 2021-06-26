@@ -1,22 +1,22 @@
 <template>
-    <nav class="nav">
+    <nav class="main-nav">
         <div class="container-elt-logo">
-            <router-link to="/news"><img id="logo" alt="logo" src="@/assets/logo.svg" width="250"></router-link>
+            <router-link to="/news"><img class="logo-groupomania" alt="logo du site" src="@/assets/logo.svg"></router-link>
         </div>
+
+
         <div class="container-elt-link">
-            <div class="link">
-                <router-link class="nav-item" to="/news"><img src="../assets/home-solid.svg" width="25"></router-link>
+            <div class="nav-link">
+                <router-link to="/news"><img src="../assets/home-solid.svg"  class="nav-link__item" alt="Accueil"></router-link>
             </div>
             
             <div class="link">
-                <router-link class="nav-item profile-pic-user" to="/profile"><img :src="profilePicUser" width="25"></router-link>
+                <router-link to="/user"><img :src="profilePicUser" class="nav-link__item nav-link__user-pic" alt="Paramètres du compte"></router-link>
             </div>
+
             <div class="link">
-                <router-link @click="onClickDisconected()" class="nav-item" to="/"><img src="../assets/power-off-solid.svg" width="25"></router-link>
+                <router-link @click="onClickDisconected()" to="/"><img src="../assets/power-off-solid.svg" class="nav-link__item" alt="Se deconnecter"></router-link>
             </div>
-
-
-
         </div>     
     </nav>
 
@@ -29,7 +29,7 @@ export default {
 
     data(){
         return {
-            profilePicUser: 'http://localhost:3000/images/profile-pic-user-default/profile-user.svg',
+            profilePicUser: '',
         }
     },
 
@@ -75,9 +75,11 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 
-.nav{
+.main-nav{
+    position: fixed;
+    z-index: 9000;
     display: flex;
     align-items: center;
     width: 100%;
@@ -87,7 +89,15 @@ export default {
     height: 75px;
 
     .container-elt-logo{
+        display: flex;
         margin-left: 20px;
+
+        .logo-groupomania{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 80%;
+        }
     }
 
     .container-elt-link{
@@ -97,10 +107,22 @@ export default {
         align-items: center;
         margin-right: 20px;
 
-        a{
-            margin-left: 20px;
-            text-decoration: none;
-            color: #2c3e50;
+        .nav-link{
+            width: auto;
+
+            &__item{
+                display: flex;
+                width: 25px;
+                margin-left: 20px;
+                text-decoration: none;
+                color: #2c3e50;
+            }
+
+            &__user-pic{
+                width: 25px;
+                height: 25px;
+                border-radius: 50%;
+            }
         }
     }
 
