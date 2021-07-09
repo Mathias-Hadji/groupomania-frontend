@@ -1,16 +1,34 @@
-import { createStore } from 'vuex'
+import { createStore } from 'vuex';
+
+import userService from '../services/userService';
+import sessionService from '../services/sessionService';
 
 export default createStore({
     
     state: {
-        modeFromVueX:'login',
-        listOfPublicationsFromVueX: null,
+        modeFromVueX: 'login',
+        
+        userIdFromVueX: 0,
+        tokenUserFromVueX: JSON.parse(localStorage.getItem('groupomania_token')) || '',
 
+        // User Data
+        firstNameUserFromVueX: '',
+        lastNameUserFromVueX: '',
+        emailUserFromVueX: '',
 
-        hideListPublicationFromVueX: false,
+        // Profile Pic
+        profilePicUserFromVueX: '',
+        successMsgProfilePicUserFromVueX: '',
+        errorMsgProfilePicUserFromVueX: '',
 
-        publicationData: [],
-        commentsOfPublication: [],
+        // Bio
+        bioUserFromVueX: '',
+        successMsgBioUserFromVueX: '',
+        errorMsgBioUserFromVueX: '',
+
+        // Password
+        successMsgPasswordUserFromVueX: '',
+        errorMsgPasswordUserFromVueX: '',
 
 
     },
@@ -18,32 +36,140 @@ export default createStore({
 
     },
     mutations: {
-
-
-        setPublicationListFromVueX(state, new_value){
-            state.publicationListFromVueX = new_value;
+        SET_MODE_FROM_VUEX(state, payload){
+            state.modeFromVueX = String(payload);
         },
 
-        setPublicationId(state, new_value){
-            state.publicationId = new_value;
+        SET_USER_ID_FROM_VUEX(state, payload){
+            state.userIdFromVueX =  Number(payload);
         },
 
-        setHideListPublicationFromVueX(state, new_value){
-            state.hideListPublicationFromVueX = new_value;
+        SET_TOKEN_USER_FROM_VUEX(state, payload){
+            state.tokenUserFromVueX = String(payload);
         },
 
-        setPublicationData(state, new_value){
-            state.publicationData = new_value;
+        SET_FIRST_NAME_USER_FROM_VUEX(state, payload){
+            state.firstNameUserFromVueX = String(payload);
         },
 
-        setCommentsOfPublication(state, new_value){
-            state.commentsOfPublication = new_value;
-        }
+        SET_LAST_NAME_USER_FROM_VUEX(state, payload){
+            state.lastNameUserFromVueX = String(payload);
+        },
+
+        SET_EMAIL_USER_FROM_VUEX(state, payload){
+            state.emailUserFromVueX = String(payload);
+        },
+
+
+
+
+        SET_PROFILE_PIC_USER_FROM_VUEX(state, payload){
+            state.profilePicUserFromVueX = payload;
+        },
+
+        SET_SUCCESS_MSG_PROFILE_PIC_USER_FROM_VUEX(state, payload){
+            state.successMsgProfilePicUserFromVueX = payload;
+        },
+
+        SET_ERROR_MSG_PROFILE_PIC_USER_FROM_VUEX(state, payload){
+            state.errorMsgProfilePicUserFromVueX = payload;
+        },
+
+
+
+
+        SET_BIO_USER_FROM_VUEX(state, payload){
+            state.bioUserFromVueX = String(payload);
+        },
+
+        SET_SUCCESS_MSG_BIO_FROM_VUEX(state, payload){
+            state.successMsgBioUserFromVueX = payload;
+        },
+
+        SET_ERROR_MSG_BIO_FROM_VUEX(state, payload){
+            state.errorMsgBioUserFromVueX = payload;
+        },
+
+
+
+        SET_SUCCESS_MSG_PASSWORD_USER_FROM_VUEX(state, payload){
+            state.successMsgPasswordUserFromVueX = payload;
+        },
+
+        SET_ERROR_MSG_PASSWORD_USER_FROM_VUEX(state, payload){
+            state.errorMsgPasswordUserFromVueX = payload;
+        },
+
     },
+
     actions: {
+        setMode(context, payload){
+            context.commit('SET_MODE_FROM_VUEX', payload);
+        },
 
-    },
-    modules: {
+        getUserId(context, token){
+            sessionService.getOneUserSession(token)
+            .then(res => {
+
+                context.commit('SET_USER_ID_FROM_VUEX', res.data.user_id_session)
+            })
+            .catch(err => console.log(err.message));
+        },
+
+        getOneUser(context, payload){
+            userService.getOneUser(payload.userId, payload.token)
+            .then(res => {
+                context.commit('SET_FIRST_NAME_USER_FROM_VUEX', res.data.first_name_user)
+                context.commit('SET_LAST_NAME_USER_FROM_VUEX', res.data.last_name_user)
+                context.commit('SET_EMAIL_USER_FROM_VUEX', res.data.email_user)
+                context.commit('SET_PROFILE_PIC_USER_FROM_VUEX', res.data.profile_pic_user)
+                context.commit('SET_BIO_USER_FROM_VUEX', res.data.bio_user)
+            })
+            .catch(err => console.log(err.message));
+        },
+
+
+        modifyProfilePicUser(context, payload){
+            userService.modifyProfilePicUser(payload.userId, payload.formData, payload.token)
+            .then(res => {
+                context.commit('SET_PROFILE_PIC_USER_FROM_VUEX', res.data.profilePic)
+                context.commit('SET_SUCCESS_MSG_PROFILE_PIC_USER_FROM_VUEX', res.data.successMessage)
+                context.commit('SET_ERROR_MSG_PROFILE_PIC_USER_FROM_VUEX', '')
+            })
+            .catch(err => {
+                context.commit('SET_ERROR_MSG_PROFILE_PIC_USER_FROM_VUEX', err.response.data.errorMessage)
+                context.commit('SET_SUCCESS_MSG_PROFILE_PIC_USER_FROM_VUEX', '')
+            });
+        },
         
+
+        modifyBioUser(context, payload){
+            userService.modifyBioUser(payload.userId, payload.token, payload.bioUser)
+            .then(res => {
+                context.commit('SET_BIO_USER_FROM_VUEX', res.data.bio)
+                context.commit('SET_SUCCESS_MSG_BIO_FROM_VUEX', res.data.successMessage)
+                context.commit('SET_ERROR_MSG_BIO_FROM_VUEX', '')
+            })
+            .catch(err => {
+                context.commit('SET_ERROR_MSG_BIO_FROM_VUEX', err.response.data.errorMessage)
+                context.commit('SET_SUCCESS_MSG_BIO_FROM_VUEX', '')
+            });
+        },
+
+        modifyPasswordUser(context, payload){
+            userService.modifyPasswordUser(payload.userId, payload.token, payload.currentPassword, payload.newPassword)
+            .then(res => {
+                context.commit('SET_SUCCESS_MSG_PASSWORD_USER_FROM_VUEX', res.data.successMessage)
+                context.commit('SET_ERROR_MSG_PASSWORD_USER_FROM_VUEX', '')
+            })
+            .catch(err => {
+                context.commit('SET_ERROR_MSG_PASSWORD_USER_FROM_VUEX', err.response.data.errorMessage)
+                context.commit('SET_SUCCESS_MSG_PASSWORD_USER_FROM_VUEX', '')
+            });
+        },
+    },
+
+    modules: {
+
     }
 })

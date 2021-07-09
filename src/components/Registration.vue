@@ -2,7 +2,7 @@
     <div class="registration-container">
         <div class="card">
             <h1 class="card__title"> S'inscrire</h1>
-            <p class="card__subtitle">Vous avez déjà un compte ? <span class="card__action" @click=switchToLogin>Se connecter</span></p>
+            <p class="card__subtitle">Vous avez déjà un compte ? <span class="card__action" @click=switchMode>Se connecter</span></p>
             <div class="form-row">
                 <input @change="validFirstName()" v-model="inputFirstName" class="input" v-bind:class="{'error-input' : errorMsgFirstName, 'valid-input' : successMsgRegistration }" type="text" placeholder="Prénom"/>
                 <input @change="validLastName()" v-model="inputLastName" class="input" v-bind:class="{'error-input' : errorMsgLastName, 'valid-input' : successMsgRegistration }" type="text" placeholder="Nom"/>
@@ -80,8 +80,8 @@ export default {
             return string.charAt(0).toUpperCase() + string.slice(1);
         },
 
-        switchToLogin(){
-            this.$store.state.modeFromVueX = 'login'
+        switchMode(){
+            this.$store.dispatch('setMode', 'login')
         },
 
         validFirstName(){

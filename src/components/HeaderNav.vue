@@ -1,23 +1,25 @@
 <template>
     <nav class="main-nav">
-        <div class="container-elt-logo">
+        <div class="container-elt-logo" v-if="getUserIdFromVueX !== 0">
             <router-link to="/news"><img class="logo-groupomania" alt="logo du site" src="@/assets/logo.svg"></router-link>
         </div>
+        <div class="container-elt-logo" v-else>
+            <img class="logo-groupomania" alt="logo du site" src="@/assets/logo.svg">
+        </div>
 
-
-        <div class="container-elt-link">
+        <div class="container-elt-link" v-if="getUserIdFromVueX !== 0">
             <div class="nav-link">
                 <router-link to="/news"><img src="../assets/home-solid.svg"  class="nav-link__item" alt="Accueil"></router-link>
             </div>
             
             <div class="link">
-                <router-link to="/user"><img :src="profilePicUser" class="nav-link__item nav-link__user-pic" alt="Paramètres du compte"></router-link>
+                <router-link to="/user"><img :src="getProfilePicUserFromVueX" class="nav-link__item nav-link__user-pic" alt="Paramètres du compte"></router-link>
             </div>
 
             <div class="link">
                 <router-link @click="onClickDisconected()" to="/"><img src="../assets/power-off-solid.svg" class="nav-link__item" alt="Se deconnecter"></router-link>
             </div>
-        </div>     
+        </div>  
     </nav>
 
 </template>
@@ -25,51 +27,38 @@
 <script>
 import axios from 'axios';
 
+import { mapState } from 'vuex';
+
 export default {
 
     data(){
         return {
-            profilePicUser: '',
+
         }
     },
 
-    computed: {
-        // Récupère la valeur de modeFromVueX dans le store de VueX
-        mode(){
-            return this.$store.state.modeFromVueX
-        }
-    },
+    computed:{
+        ...mapState({
+            getUserTokenFromVueX: 'tokenUserFromVueX',
+            getUserIdFromVueX: 'userIdFromVueX',
+            getProfilePicUserFromVueX: 'profilePicUserFromVueX',
+        }),
 
-
-    mounted(){
-
-        axios.get(`http://localhost:3000/api/user/${this.getUserIdFromLocalStorage()}`,{
-            headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage() }`}
-        })
-        .then(response => {
-            this.profilePicUser = response.data.profile_pic_user
-        })
-        .catch(error => console.log(error))
     },
 
     methods:{
+
         onClickDisconected(){
-
-            window.localStorage.removeItem('groupomania_token');
-            window.localStorage.removeItem('groupomania_publicationsLiked');
-            window.localStorage.removeItem('groupomania_userId');
-            window.localStorage.removeItem('groupomania_isAdmin');
-        },
-
-
-
-
-        getTokenFromLocalStorage(){
-            return JSON.parse(localStorage.getItem('groupomania_token'))
-        },
-
-        getUserIdFromLocalStorage(){
-            return JSON.parse(localStorage.getItem('groupomania_userId'))
+            axios.delete(`http://localhost:3000/api/session`, {
+                headers: { Authorization: `Bearer ${this.getUserTokenFromVueX}`}
+            })
+            .then(() => {
+                window.localStorage.removeItem('groupomania_token');
+                window.localStorage.removeItem('groupomania_publicationsLiked');
+                
+                window.location.href = 'http://localhost:8080';
+            })
+            .catch(error => console.log(error.response))
         },
     }
 }
@@ -78,8 +67,6 @@ export default {
 <style lang="scss" scoped>
 
 .main-nav{
-    position: fixed;
-    z-index: 9000;
     display: flex;
     align-items: center;
     width: 100%;
@@ -89,6 +76,7 @@ export default {
     height: 75px;
 
     .container-elt-logo{
+        width: 300px;
         display: flex;
         margin-left: 20px;
 
@@ -96,7 +84,7 @@ export default {
             display: flex;
             justify-content: center;
             align-items: center;
-            width: 80%;
+            width: 100%;
         }
     }
 

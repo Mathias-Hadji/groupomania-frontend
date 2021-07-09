@@ -2,7 +2,7 @@
     <div class="settings-user-card-container">
         <div class="card">
             <header class="username">
-                <h1 class="username__title">{{ firstNameUser }} {{ lastNameUser }}</h1>
+                <h1 class="username__title">{{ getFirstNameUserFromVueX }} {{ getLastNameUserFromVueX }}</h1>
             </header>
 
             <section class="row">
@@ -10,7 +10,7 @@
                     <h2 class="section-profile-pic__title">Photo de profil</h2>
 
                     <div class="container-profile-pic">
-                        <img v-if="imageTempUrl == null" class="container-profile-pic__pic" :src="profilePicUser" alt="image de profil">
+                        <img v-if="imageTempUrl == null" class="container-profile-pic__pic" :src="getProfilePicUserFromVueX" alt="image de profil">
                         <img v-else class="container-profile-pic__pic" :src="imageTempUrl" alt="image de profil"> 
                     </div>
 
@@ -21,26 +21,25 @@
                         <button @click="modifyProfilePic" class="btn-profile-pic__btn button-primary">Valider</button>
                         <button @click="cancelModifyProfilePic" class="btn-profile-pic__btn button-danger">Annuler</button>
                     </div>
-                    <p v-if="successMsgProfilePic != null" class="section-profile-pic__success-message text-success">{{ successMsgProfilePic }}</p> 
-                    <p v-if="errorMsgProfilePic != null" class="section-profile-pic__error-message text-danger">{{ errorMsgProfilePic }}</p>
+                    <p v-if="getSuccessMsgProfilePicUserFromVueX != null" class="section-profile-pic__success-message text-success">{{ getSuccessMsgProfilePicUserFromVueX }}</p> 
+                    <p v-if="getErrorMsgProfilePicUserFromVueX != null" class="section-profile-pic__error-message text-danger">{{ getErrorMsgProfilePicUserFromVueX }}</p>
                 </section>
 
                 <section class="section-user-information">
                     <div div class="user-information">
                         <h2 class="user-information__title">Email</h2>
-                        <p>{{ userEmail }}</p>
+                        <p>{{ getEmailUserFromVueX }}</p>
                     </div> 
                     <div class="user-bio">
                         <h2 class="user-bio__title">Bio</h2>
-                        <p class="user-bio__content-bio">{{ bioUser }}</p>
+                        <p class="user-bio__content-bio">{{ getBioUserFromVueX }}</p>
                         <textarea v-model="inputBioUser" class="user-bio__message-input" rows="5" maxlength="255" placeholder="Ajouter un texte ..."></textarea>
                         <button @click="modifyBioUser" class="button">Modifier ma bio</button>
-                        <p v-if="successMsgBio != null" class="user-bio__success-message text-success">{{ successMsgBio }}</p> 
-                        <p v-if="errorMsgBio != null" class="user-bio__error-message text-danger">{{ errorMsgBio }}</p>   
+                        <p v-if="getSuccessMsgBioUserFromVueX != null" class="user-bio__success-message text-success">{{ getSuccessMsgBioUserFromVueX }}</p> 
+                        <p v-if="getErrorMsgBioUserFromVueX != null" class="user-bio__error-message text-danger">{{ getErrorMsgBioUserFromVueX }}</p>   
                     </div>
                 </section>
             </section>
-
             <hr>
 
             <section class="row">
@@ -54,8 +53,8 @@
                         <label class="update-password__label" for="new-password">Nouveau mot de passe :</label>
                         <input v-model="inputUserNewPassword" class="update-password__input" type="password" name="new-password" required>
                         <button @click="modifyPassword" v-bind:disabled="btnDisabled == true" v-bind:class="{'button--disabled' : btnDisabled}" class="button">Valider</button>
-                        <p v-if="errorMsgCurrentPassword != null" class="update-password__error-message text-danger">{{ errorMsgCurrentPassword }}</p>
-                        <p v-if="successMsgPassword != null" class="update-password__success-message text-success">{{ successMsgPassword }}</p>
+                        <p v-if="getErrorMsgPasswordUserFromVueX != null" class="update-password__error-message text-danger">{{ getErrorMsgPasswordUserFromVueX }}</p>
+                        <p v-if="getSuccessMsgPasswordUserFromVueX != null" class="update-password__success-message text-success">{{ getSuccessMsgPasswordUserFromVueX }}</p>
                     </div>
                 </section>
 
@@ -71,20 +70,14 @@
 
 <script>
 import axios from 'axios';
+import { mapState } from 'vuex';
 
 export default {
     data(){
         return{
 
-            userData:'',
-
-            firstNameUser: '',
-            lastNameUser: '',
-
-            userEmail: '',
-
             inputBioUser: '',
-            bioUser:'',
+
 
             inputUserCurrentPassword: '',
             inputUserNewPassword: '',
@@ -101,35 +94,33 @@ export default {
             errorMsgCurrentPassword: null,
             errorMsgNewPassword:null,
 
-            successMsgBio: null,
-            errorMsgBio: null,
 
             successMsgProfilePic: null,
             errorMsgProfilePic: null,
         }
     },
-    
 
-    mounted(){
-        axios.get(`http://localhost:3000/api/user/${this.getUserIdFromLocalStorage()}`,{
-            headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage() }`}
-        })
-        .then(res => {
-
-            this.userData = res.data
-
-            this.profilePicUser = this.userData.profile_pic_user
-
-            this.firstNameUser = this.userData.first_name_user
-            this.lastNameUser = this.userData.last_name_user
-
-            this.userEmail = this.userData.email_user
-            this.bioUser = this.userData.bio_user
-        })
-        .catch(error => console.log(error))
-    },
 
     computed:{
+        ...mapState({
+            getUserIdFromVueX: 'userIdFromVueX',
+            getUserTokenFromVueX: 'tokenUserFromVueX',
+        
+            getFirstNameUserFromVueX: 'firstNameUserFromVueX',
+            getLastNameUserFromVueX: 'lastNameUserFromVueX',
+            getEmailUserFromVueX: 'emailUserFromVueX',
+
+            getProfilePicUserFromVueX: 'profilePicUserFromVueX',
+            getSuccessMsgProfilePicUserFromVueX: 'successMsgProfilePicUserFromVueX',
+            getErrorMsgProfilePicUserFromVueX: 'errorMsgProfilePicUserFromVueX',
+
+            getBioUserFromVueX: 'bioUserFromVueX',
+            getSuccessMsgBioUserFromVueX: 'successMsgBioUserFromVueX',
+            getErrorMsgBioUserFromVueX: 'errorMsgBioUserFromVueX',
+
+            getSuccessMsgPasswordUserFromVueX: 'successMsgPasswordUserFromVueX',
+            getErrorMsgPasswordUserFromVueX: 'errorMsgPasswordUserFromVueX',
+        }),
         
         btnDisabled(){
             if(this.inputUserCurrentPassword.length > 0 && this.inputUserNewPassword.length > 0){
@@ -140,7 +131,29 @@ export default {
         },
     },
 
+
     methods:{
+        modifyBioUser(){
+            this.$store.dispatch('modifyBioUser', { userId: this.getUserIdFromVueX, token: this.getUserTokenFromVueX, bioUser: this.inputBioUser })
+            this.inputBioUser = ''
+        },
+
+        modifyProfilePic(){
+            
+            let formData = new FormData();
+            formData.append('userId', this.getUserIdFromVueX);
+            formData.append('image', this.selectedFile);
+
+            this.$store.dispatch('modifyProfilePicUser', { userId: this.getUserIdFromVueX, formData: formData, token: this.getUserTokenFromVueX })
+        },
+
+        modifyPassword(){
+            this.$store.dispatch('modifyPasswordUser', { userId: this.getUserIdFromVueX, token: this.getUserTokenFromVueX, currentPassword: this.inputUserCurrentPassword, newPassword: this.inputUserNewPassword})
+            this.inputUserCurrentPassword = ''
+            this.inputUserNewPassword = ''
+        },
+
+
         previewImage(event) {
             this.validBtnProfilePic = true;
             this.cancelBtnProfilePic = true;
@@ -163,36 +176,34 @@ export default {
         },
 
 
-        modifyProfilePic(){
-
-            let formData = new FormData()
+        modifyProfilePicOld(){
+            
+            let formData = new FormData();
+            formData.append('userId', this.getUserIdFromVueX);
             formData.append('image', this.selectedFile);
 
-            axios.put(`http://localhost:3000/api/user/profile-pic`, formData, { 
-                headers: {
-                    Authorization: `Bearer ${this.getTokenFromLocalStorage()}`,
-                    'Content-Type': 'multipart/form-data',
-                }
+            axios.put(`http://localhost:3000/api/user/profile-pic/${this.getUserIdFromVueX}`, formData, { 
+                headers: {'Content-Type': 'multipart/form-data', Authorization: `Bearer ${this.getUserTokenFromVueX}`}
             })
             .then(response => {
                 this.errorMsgProfilePic = null;
                 this.successMsgProfilePic = response.data.message;
 
-                axios.get(`http://localhost:3000/api/user/${this.getUserIdFromLocalStorage()}`,{
-                    headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage() }`}
+                axios.get(`http://localhost:3000/api/user/${this.getUserIdFromVueX}`,{
+                    headers: { Authorization: `Bearer ${this.getUserTokenFromVueX }`}
                 })
                 .then(response => {
                     this.validBtnProfilePic = false;
-                    this.profilePicUser = response.data.profile_pic_user
+                    this.profilePicUser = response.data.profile_pic_user;
                 })
                 .catch(error => { 
-                    console.log(error.response)
+                    console.log(error.response);
                 })
 
             })
             .catch(error => {
                 this.successMsgProfilePic = null;
-                console.log(error.response)
+                console.log(error.response);
             });
         },
 
@@ -201,74 +212,20 @@ export default {
             this.reloadPage()
         },
 
-        modifyBioUser(){
-            axios.put(`http://localhost:3000/api/user/bio`, 
-            { bioUser: this.inputBioUser },
-            {
-                headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage() }`}            
-            })
-            .then(res => {
-                this.errorMsgBio = null;
-                this.successMsgBio = res.data.message;
-
-
-                axios.get(`http://localhost:3000/api/user/${this.getUserIdFromLocalStorage()}`,{
-                    headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage() }`}
-                })
-                .then(res => {
-                    this.bioUser = res.data.bio_user
-                    this.inputBioUser = ''
-                })
-                .catch(error => {
-                    console.log(error.response)
-                })
-
-            })
-            .catch(err => {
-                this.successMsgBio = null
-                console.log(err.response)
-                this.errorMsgBio = err.response.data.message;
-            })
-        },
-
-        modifyPassword(){
-
-            axios.put(`http://localhost:3000/api/user/password`, 
-            { 
-                inputUserCurrentPassword: this.inputUserCurrentPassword, 
-                inputUserNewPassword: this.inputUserNewPassword
-            },
-            { headers: { 
-                Authorization: `Bearer ${this.getTokenFromLocalStorage() }`}})
-            .then(res => {
-                this.errorMsgCurrentPassword = null;
-                this.errorMsgNewPassword = null;
-                this.successMsgPassword = res.data.message;
-                this.inputUserCurrentPassword = ''
-                this.inputUserNewPassword = ''
-            })
-            .catch(err => {
-                this.successMsgPassword = null;
-                this.errorMsgCurrentPassword = err.response.data.notValid;
-                this.errorMsgNewPassword = err.response.data.notValid;
-                this.inputUserCurrentPassword = ''
-                this.inputUserNewPassword = ''
-            })
-
-        },
 
         deleteAccount(){
             const confirmMsgDeleteAccount = confirm('Attention, cette action est irreversible. Etes-vous sûr de vouloir supprimer votre compte ?')
 
             if(confirmMsgDeleteAccount == true){
-                axios.delete(`http://localhost:3000/api/user/delete-account`, {
-                    headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage() }`}
+                axios.delete(`http://localhost:3000/api/user/delete-account/${this.getUserIdFromVueX}`, {
+                    headers: { Authorization: `Bearer ${this.getUserTokenFromVueX}`}
                 })
                 .then(() => {
 
+                    this.deleteUserSession();
+
                     window.localStorage.removeItem('groupomania_token');
                     window.localStorage.removeItem('groupomania_publicationsLiked');
-                    window.localStorage.removeItem('groupomania_userId');
 
                     window.location.href = '/';
 
@@ -279,16 +236,16 @@ export default {
             }
         },
 
+        deleteUserSession(){
+            axios.delete(`http://localhost:3000/api/session`, {
+                headers: { Authorization: `Bearer ${this.getUserTokenFromVueX }`}
+            })
+            .then()
+            .catch(error => console.log(error.response))
+        },
+
         reloadPage(){
             window.location.reload()
-        },
-
-        getTokenFromLocalStorage(){
-            return JSON.parse(localStorage.getItem('groupomania_token'))
-        },
-
-        getUserIdFromLocalStorage(){
-            return JSON.parse(localStorage.getItem('groupomania_userId'))
         },
     }
 }
@@ -306,7 +263,7 @@ export default {
     .card{
         display: flex;
         flex-direction: column;
-        width: 80%;
+        width: 900px;
         background: #FFF;
         border-radius: 16px;
         padding:32px;
@@ -344,8 +301,8 @@ export default {
                     &__pic{
                         margin-bottom: 20px;
                         border-radius:50%;
-                        width:20vw;
-                        height:20vw;
+                        width:12vw;
+                        height:12vw;
                         box-shadow: 3px 3px 5px 0px rgba(0,0,0,0.75);
                         -webkit-box-shadow: 3px 3px 5px 0px rgba(0,0,0,0.75);
                         -moz-box-shadow: 3px 3px 5px 0px rgba(0,0,0,0.75);

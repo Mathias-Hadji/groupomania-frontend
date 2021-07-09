@@ -1,27 +1,34 @@
 <template>
     <div>
-        <nav class="main-navbar">
-            <HeaderNav/>
-        </nav>
-
         <router-view/>
     </div>
 </template>
 
 
 <script>
-import HeaderNav from '@/components/HeaderNav.vue'
 
 export default {
     components: {
-        HeaderNav,
+
+    },
+
+    data(){
+        return{
+
+        }
     },
 
     computed: {
-        modeFromVueX(){
-            return this.$store.state.modeFromVueX
-        }
-    }
+
+    },
+
+    mounted(){
+
+    },
+
+    methods:{
+
+    },
 }
 </script>
 
@@ -43,7 +50,7 @@ export default {
 }
 
 .main-navbar{
-    padding-bottom: 50px;
+    padding-bottom: 20px;
 }
 
 .button {

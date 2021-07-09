@@ -2,7 +2,7 @@
     <div class="login-container">
         <div class="card">
             <h1 class="card__title"> Se connecter</h1>
-            <p class="card__subtitle">Vous n'avez pas encore de compte ? <span class="card__action" @click=switchToCreateAccount>Créer un compte</span></p>
+            <p class="card__subtitle">Vous n'avez pas encore de compte ? <span class="card__action" @click=switchMode>Créer un compte</span></p>
 
             <div class="form-row">
                 <input v-model="inputEmail" class="form-row__input" type="email" placeholder="Adresse mail"/>
@@ -55,6 +55,9 @@ export default {
     },
 
     methods: {
+        getTokenFromLocalStorage(){
+            return JSON.parse(localStorage.getItem('groupomania_token'))
+        },
 
         setTokenFromLocalStorage(token){
             localStorage.setItem('groupomania_token', JSON.stringify(token))
@@ -68,26 +71,39 @@ export default {
             localStorage.setItem('groupomania_isAdmin', JSON.stringify(isAdmin))
         },  
 
-        switchToCreateAccount(){
-            this.$store.state.modeFromVueX = 'createAccount';
+        switchMode(){
+            this.$store.dispatch('setMode', 'createAccount')
         },
 
+        setUserSession(){
+            axios.post(`http://localhost:3000/api/session`,{},{
+                headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage() }`}
+            })
+            .then(res => console.log(res))
+            .catch(err => {
+                console.log(err.response);
+            })
+        },
 
         login(){
 
             if(this.emailRegExp.test(this.inputEmail) && this.passwordRegExp.test(this.inputPassword)){
 
-                axios.post('http://localhost:3000/api/user/login',
-                { email: this.inputEmail.trim(), password: this.inputPassword })
+                axios.post('http://localhost:3000/api/user/login', { 
+                    email: this.inputEmail.trim(),
+                    password: this.inputPassword 
+                })
                 .then(response => {
+                    console.log(response)
 
                     this.errorMsgLogin = null;
                     this.successMsgLogin = response.data.message;
-                    
+
+
                     this.setTokenFromLocalStorage(response.data.token);
-                    this.setUserIdFromLocalStorage(response.data.userId);
-                    this.setIsAdminFromLocalStorage(response.data.isAdmin);
-                
+
+                    this.setUserSession()
+
                     window.location.href = 'http://localhost:8080/news';
                     
                 })

@@ -2,7 +2,6 @@
     <article class="publication-card-container">
         <div class="card">
             <div class="main-container">
-
                 <section class="section-author-pic">
                     <div class="author-publication">
                         <img class="author-publication__profile-pic" :src="authorPublicationData.profile_pic_user" alt="image de profil">
@@ -17,7 +16,7 @@
                                 <p class="info-publication__date">{{ publicationData.createdAt }}</p>
                             </div>        
                             <div class="delete-publication">
-                                <img class="delete-publication__icon" width="15" src="../assets/times-solid.svg" v-if="getUserIdFromLocalStorage() == publicationData.user_id_publication || getIsAdminFromLocalStorage() == 1" @click="deletePublication()" alt="bouton supprimer">
+                                <img class="delete-publication__icon" width="15" src="../assets/times-solid.svg" v-if="getUserIdFromVueX == publicationData.user_id_publication || userIsAdmin == 1" @click="deletePublication()" alt="bouton supprimer">
                             </div>  
                         </header> 
                         <section class="content-publication">
@@ -33,7 +32,7 @@
                         <div class="like-and-comment-publication">
                             <div class="like-publication">
                                 <img v-if="arrayPublicationLikedByUser && arrayPublicationLikedByUser.includes(publicationId)" @click="onLikePublication()" class="like-publication__icon" src="../assets/heart-solid.svg" alt="bouton like">
-                                <img v-else @click="onLikePublication()" class="like-publication__icon" src="../assets/heart-regular.svg" alt="bouton like">
+                                <img v-else @click="onLikePublication()" class="like-publication__icon-liked" src="../assets/heart-regular.svg" alt="bouton like">
                                 <p class="like-publication__counter">{{ likesPublication.length }}</p>
                             </div>
 
@@ -94,7 +93,7 @@
                         </div>
 
                         <div class="delete-comment">
-                            <img class="delete-comment__icon" src="../assets/times-solid.svg" alt="icone supprimer" v-if="getUserIdFromLocalStorage() == comment.user_id_comment || getIsAdminFromLocalStorage() == 1" @click="deleteOneComment(comment.id)">
+                            <img class="delete-comment__icon" src="../assets/times-solid.svg" alt="icone supprimer" v-if="getUserIdFromVueX == comment.user_id_comment || userIsAdmin == 1" @click="deleteOneComment(comment.id)">
                         </div>
                     </div>
                 </div>
@@ -104,28 +103,19 @@
 </template>
 
 <script>
+import publicationService from '../services/publicationService';
 import axios from 'axios';
 
+import { mapGetters } from 'vuex';
+
 export default {
-
     name: 'Publication',
-
-    components: {
-
-    },
-
-    props: {
-        publicationId: Number,
-    },
-
-    computed: {
-        urlPublication(){
-            return 'http://localhost:8080/post/?id=' + this.publicationData.id
-        }
-    },
 
     data(){
         return {
+
+            userIsAdmin: 0,
+
             publicationData: [],
             authorPublicationData: [],
 
@@ -141,39 +131,40 @@ export default {
         }
     },
 
-    mounted(){
-        this.getOnePublication()
-        this.getLikesOfOnePublication()
-        this.getPublicationsLikedByOneUser()
-        this.getCommentsOfOnePublication()
-        this.getUserLoggedInformations()
+    props: {
+        publicationId: {
+            type: Number,
+            required: true
+        }
+    },
+
+    computed: {
+        ...mapGetters({
+            getUserIdFromVueX: 'getUserId',
+            getUserTokenFromVueX: 'getTokenUser'
+        }),
+
+        urlPublication(){
+            return 'http://localhost:8080/post/?id=' + this.publicationData.id
+        },
+    },
+
+    created(){
+        this.getOnePublication();
+        this.getLikesOfOnePublication();
+        this.getPublicationsLikedByOneUser();
+        this.getCommentsOfOnePublication();
+        this.getUserLoggedInformations();
     },
 
     methods:{
-
-        onSharePublication(){
-            this.showUrlPublication = !this.showUrlPublication
-            this.shareLinkIsClicked = false
-        },
-
-        copyText() {
-            navigator.clipboard.writeText(this.urlPublication)
-            this.shareLinkIsClicked = !this.shareLinkIsClicked
-        },
-
-
         getOnePublication(){
-
-            axios.get(`http://localhost:3000/api/publication/${this.publicationId}`,{
-                headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage()}` }
-            })
+            publicationService.getOnePublication(this.publicationId ,this.getUserTokenFromVueX)
             .then(res => {
-                this.publicationData = res.data
-                this.authorPublicationData = res.data.User
-            }) 
-            .catch(error => {
-                console.log(error.response);
+                this.publicationData = res.data;
+                this.authorPublicationData = res.data.User;
             })
+            .catch(err => console.log(err.response));
         },
         
 
@@ -181,31 +172,27 @@ export default {
             const confirmMsgDeletePublication = confirm('Etes-vous sûr de vouloir supprimer votre publication ? Attention, cette action est irreversible.')
 
             if(confirmMsgDeletePublication == true){
-                axios.delete(`http://localhost:3000/api/publication/${this.publicationId}`, {
-                    headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage()}` }
-                })
-                .then(() => {
-                    this.$emit('updateListOfPublications')
-                })
-                .catch(error => {
-                    console.log(error.response);
-                })
-            } else {
-                alert('Suppression annulée.')               
-            }
-        }, 
 
+                publicationService.deleteOnePublication(this.publicationId, this.getUserIdFromVueX, this.getUserTokenFromVueX)
+                .then(() => {
+                    this.$emit('updateListOfPublications');
+                })
+                .catch(err => console.log(err.response));
+
+            } else {
+                alert('Suppression annulée.');              
+            }
+        },
 
 
 
         getLikesOfOnePublication(){
-
             // Get likes of one publication
             axios.get(`http://localhost:3000/api/like-publication/publication/${this.publicationId}`,{
-                headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage()}` }
+                headers: { Authorization: `Bearer ${this.getUserTokenFromVueX}` }
             })
             .then(res => {
-                this.likesPublication = res.data
+                this.likesPublication = res.data;
             }) 
             .catch(error => {
                 console.log(error.response);
@@ -215,11 +202,10 @@ export default {
 
         getPublicationsLikedByOneUser(){
             // Get Publications Liked by one user
-            axios.get(`http://localhost:3000/api/like-publication/user/${this.getUserIdFromLocalStorage()}`,{
-                headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage()}` }
+            axios.get(`http://localhost:3000/api/like-publication/user/${this.getUserIdFromVueX}`,{
+                headers: { Authorization: `Bearer ${this.getUserTokenFromVueX}` }
             })
             .then(res => {
-
                 this.arrayPublicationLikedByUser = []
 
                 for(let i = 0; i < res.data.length; i++){
@@ -234,28 +220,24 @@ export default {
 
 
         onLikePublication(){
-
-            axios.post(`http://localhost:3000/api/like-publication/publication/${this.publicationId}`,{},{
-                headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage() }`}
-            })
+            axios.post(`http://localhost:3000/api/like-publication/publication/${this.publicationId}`,
+            { userId: this.getUserIdFromVueX },
+            { headers: { Authorization: `Bearer ${this.getUserTokenFromVueX }`}})
             .then(() => {
-                this.getLikesOfOnePublication()
-                this.getPublicationsLikedByOneUser()
+                this.getLikesOfOnePublication();
+                this.getPublicationsLikedByOneUser();
             })
             .catch(err => {
                 console.log(err.response);
             })
         },
 
-
-
         getCommentsOfOnePublication(){
-
             axios.get(`http://localhost:3000/api/comment/publication/${this.publicationId}`,{
-                headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage()}` }
+                headers: { Authorization: `Bearer ${this.getUserTokenFromVueX}` }
             })
             .then(res => {
-                this.comments = res.data
+                this.comments = res.data;
             }) 
             .catch(error => {
                 console.log(error.response);
@@ -263,19 +245,18 @@ export default {
         },
 
         publishNewComment(){
-
             axios.post(`http://localhost:3000/api/comment/publication/${this.publicationId}`, 
-            { comment : this.addNewComment },
-            { headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage() }`}})
+            { userId: this.getUserIdFromVueX, comment: this.addNewComment },
+            { headers: { Authorization: `Bearer ${this.getUserTokenFromVueX }`}})
             .then(res => {
-                console.log(res)
+                console.log(res);
                 this.addNewComment = ''
 
                 axios.get(`http://localhost:3000/api/comment/publication/${this.publicationId}`,{
-                    headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage()}` }
+                    headers: { Authorization: `Bearer ${this.getUserTokenFromVueX}` }
                 })
                 .then(res => {
-                    this.comments = res.data
+                    this.comments = res.data;
                 }) 
                 .catch(error => {
                     console.log(error.response);
@@ -288,20 +269,20 @@ export default {
 
 
         deleteOneComment(commentId){
-
             const confirmMsgDeletePublication = confirm('Etes-vous sûr de vouloir supprimer votre commentaire ? Attention, cette action est irreversible.')
 
             if(confirmMsgDeletePublication == true){
 
                 axios.delete(`http://localhost:3000/api/comment/${commentId}`, 
-                { headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage()}`}})
+                { data: { userId: this.getUserIdFromVueX },
+                headers: { Authorization: `Bearer ${this.getUserTokenFromVueX}`}})
                 .then(() => {
 
                     axios.get(`http://localhost:3000/api/comment/publication/${this.publicationId}`,{
-                        headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage()}` }
+                        headers: { Authorization: `Bearer ${this.getUserTokenFromVueX}` }
                     })
                     .then(res => {
-                        this.comments = res.data
+                        this.comments = res.data;
                     }) 
                     .catch(error => {
                         console.log(error.resonse);
@@ -311,33 +292,30 @@ export default {
                     console.log(err.response);
                 })
             } else {
-                alert('Suppression annulée.') 
+                alert('Suppression annulée.');
             }
         },
 
         getUserLoggedInformations(){
-
-            axios.get(`http://localhost:3000/api/user/${this.getUserIdFromLocalStorage()}`,{
-                headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage() }`}
+            axios.get(`http://localhost:3000/api/user/${this.getUserIdFromVueX}`,{
+                headers: { Authorization: `Bearer ${this.getUserTokenFromVueX }`}
             })
             .then(response => {
-                this.profilePicUser = response.data.profile_pic_user
+                this.userIsAdmin = response.data.is_admin;
+                this.profilePicUser = response.data.profile_pic_user;
             })
             .catch(error => console.log(error.response))
+        },   
+        
+        onSharePublication(){
+            this.showUrlPublication = !this.showUrlPublication;
+            this.shareLinkIsClicked = false;
         },
 
-
-        getTokenFromLocalStorage(){
-            return JSON.parse(localStorage.getItem('groupomania_token'))
+        copyText() {
+            navigator.clipboard.writeText(this.urlPublication);
+            this.shareLinkIsClicked = !this.shareLinkIsClicked;
         },
-
-        getUserIdFromLocalStorage(){
-            return JSON.parse(localStorage.getItem('groupomania_userId'))
-        },    
-
-        getIsAdminFromLocalStorage(){
-            return JSON.parse(localStorage.getItem('groupomania_isAdmin'))
-        },    
     },
 }
 </script>
@@ -467,11 +445,18 @@ export default {
                             &__icon{
                                 width: 20px;
                                 margin-right: 10px;
-                                filter: invert(18%) sepia(3%) saturate(36%) hue-rotate(328deg) brightness(91%) contrast(81%);   
+                                filter: invert(15%) sepia(55%) saturate(6166%) hue-rotate(326deg) brightness(96%) contrast(90%);
+  
+                                cursor: pointer; 
+                            }
+
+                            &__icon-liked{
+                                width: 20px;
+                                margin-right: 10px;
+                                filter: invert(18%) sepia(3%) saturate(36%) hue-rotate(328deg) brightness(91%) contrast(81%); 
                                 cursor: pointer; 
                             }
                         }
-
                         .counter-comment-publication{
                             display: flex;
                             align-items: center;
@@ -623,6 +608,7 @@ export default {
                             background: rgb(236, 236, 236);
                             border-radius: 15px;
                             padding: 8px;
+                            border-radius: 4px;
 
                             &__name{
                                 font-weight: bold;

@@ -19,15 +19,13 @@
             </form>
         </div>
     </section>
-
-
 </template>
 
 <script>
 import axios from 'axios';
 
 export default {
-    name: 'FormPublication',
+    name: 'PublicationCreate',
 
     data(){
         return {
@@ -39,19 +37,35 @@ export default {
         }
     },
 
+    props: {
+
+    },
+
+    mounted(){
+
+    },
+
+    computed: {
+        getUserIdFromVueX(){
+            return this.$store.state.userIdFromVueX;
+        },
+
+        getUserTokenFromVueX(){
+            return this.$store.state.tokenUserFromVueX;
+        },
+    },
+
     methods:{
 
         createNewPublication(){
             let formData = new FormData()
+            formData.append('userId', this.getUserIdFromVueX);
             formData.append('message', this.message);
             formData.append('image', this.selectedFile);
 
-            axios.post('http://localhost:3000/api/publication', formData, {
-                headers: {
-                    Authorization: `Bearer ${this.getTokenFromLocalStorage()}`,
-                    'Content-Type': 'multipart/form-data',
-                }
-            })
+            axios.post('http://localhost:3000/api/publication',
+            formData,
+            { headers: {'Content-Type': 'multipart/form-data', Authorization: `Bearer ${this.getUserTokenFromVueX}`}})
             .then(() => {
                 this.message = ''
                 this.file = ''
@@ -59,7 +73,7 @@ export default {
                 this.selectedFile = null
                 this.$emit('updateListOfPublications')
             })
-            .catch(error => console.log(error));
+            .catch(error => console.log({error: error}));
         },
 
         previewImage(event) {
@@ -84,23 +98,6 @@ export default {
         cancelPrevImage(){
             document.getElementById('inputUploadImg').value = ""
             this.imageTempUrl = null          
-        },
-
-
-        replaceSymbol(message){ 
-            return message.split("'").join('&apos;')
-        },
-
-        reloadPage(){
-            window.location.reload()
-        },
-
-        getTokenFromLocalStorage(){
-            return JSON.parse(localStorage.getItem('groupomania_token'))
-        },
-
-        getUserIdFromLocalStorage(){
-            return JSON.parse(localStorage.getItem('groupomania_userId'))
         },
     }   
 }

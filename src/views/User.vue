@@ -1,16 +1,57 @@
 <template>
-    <main class="user">
-        <SettingsUserCard />
-    </main>
+    <div>
+        <nav class="main-navbar">
+            <HeaderNav/>
+        </nav>
+        <main class="user">
+            <SettingsUserCard/>
+        </main>
+    </div>
 </template>
 
 <script>
-import SettingsUserCard from '@/components/SettingsUserCard.vue'
+import { mapState } from 'vuex';
+
+import HeaderNav from '@/components/HeaderNav.vue';
+import SettingsUserCard from '@/components/SettingsUserCard.vue';
 
 export default {
     name: 'User',
+
     components: {
+        HeaderNav,
         SettingsUserCard,
+    },
+
+    data(){
+        return{
+
+        }
+    },
+    computed:{
+
+        ...mapState({
+            getUserTokenFromVueX: 'tokenUserFromVueX',
+            getUserIdFromVueX: 'userIdFromVueX',
+            getUserDataFromVueX: 'userDataFromVueX',
+        }),
+        
+
+    },
+
+    created(){
+        this.$store.dispatch('getUserId', this.getUserTokenFromVueX)
+    },
+    
+    watch: {
+        getUserIdFromVueX: function(){
+            this.$store.dispatch('getOneUser', { userId: this.getUserIdFromVueX, token: this.getUserTokenFromVueX })
+        }
+    },
+
+
+    methods:{
+
     }
 }
 </script>
