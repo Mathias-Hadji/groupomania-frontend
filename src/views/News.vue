@@ -1,18 +1,15 @@
 <template>
     <main class="news">
-        <nav class="main-navbar" v-if="dataLoaded">
+        <nav class="main-navbar">
             <HeaderNav/>
         </nav>
 
-        <PublicationCreate
-            v-on:updateListOfPublications="getAllPublications()"
-        />
+        <PublicationCreate/>
 
         <PublicationCard
-            v-for="publication in listOfPublications"
+            v-for="publication in getListOfPublications"
             v-bind:key="publication.id"
             v-bind:publicationId="publication.id"
-            v-on:updateListOfPublications="getAllPublications()"
         />
     </main>
 </template>
@@ -20,7 +17,8 @@
 
 
 <script>
-import axios from 'axios';
+import { mapState } from 'vuex';
+
 
 import HeaderNav from '@/components/HeaderNav.vue';
 import PublicationCreate from '@/components/PublicationCreate.vue';
@@ -39,62 +37,33 @@ export default {
 
     data(){
         return {
-            dataLoaded: false,
-            listOfPublications: []
+
         }
     },
 
-    mounted(){
-        this.getUserId()
-        this.setUserTokenInVueX()
+    computed:{
+        ...mapState({
+            getUserIdFromVueX: 'userIdFromVueX',
+            getUserTokenFromVueX: 'tokenUserFromVueX',
+            getListOfPublications: 'listOfPublicationsFromVueX',
+
+        }),
+    },
+
+    created(){
+        this.$store.dispatch('getUserId', this.getUserTokenFromVueX)
         this.getAllPublications()
     },
 
-    computed: {
-        
+    watch: {
+        getUserIdFromVueX: function(){
+            this.$store.dispatch('getOneUser', { userId: this.getUserIdFromVueX, token: this.getUserTokenFromVueX })
+        }
     },
 
-    methods: {
-
-        getUserId(){
-            axios.get(`http://localhost:3000/api/session/${this.getTokenFromLocalStorage()}`,{
-                headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage()}`}
-            })
-            .then(response => {
-                this.$store.commit('SET_USER_ID_FROM_VUEX', response.data.user_id_session)
-
-                this.dataLoaded = true;
-            })
-            .catch(error => { 
-                if(error.response.status === 401){
-                    window.location.href = 'http://localhost:8080';
-                }
-                console.log(error.response)
-            })
-        },
-        
+    methods: {  
         getAllPublications(){
-            
-            axios.get('http://localhost:3000/api/publication',{
-                headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage()}` }
-            })
-            .then(response => {
-                this.listOfPublications = response.data;
-            }) 
-            .catch(error => {
-                if(error.response.status === 401){
-                    window.location.href = 'http://localhost:8080';
-                }
-                console.log(error.response)
-            })
-        },
-
-        getTokenFromLocalStorage(){
-            return JSON.parse(localStorage.getItem('groupomania_token'))
-        },
-
-        setUserTokenInVueX(){
-            this.$store.commit('SET_TOKEN_USER_FROM_VUEX', this.getTokenFromLocalStorage())
+            this.$store.dispatch('getAllPublications', { token: this.getUserTokenFromVueX })
         },
     },
 }

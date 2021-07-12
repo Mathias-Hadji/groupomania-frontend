@@ -28,15 +28,18 @@ export default {
 
         }
     },
+
     computed:{
-
         ...mapState({
-            getUserTokenFromVueX: 'tokenUserFromVueX',
             getUserIdFromVueX: 'userIdFromVueX',
-            getUserDataFromVueX: 'userDataFromVueX',
-        }),
-        
+            getUserTokenFromVueX: 'tokenUserFromVueX',
+            
+            getFirstNameUserFromVueX: 'firstNameUserFromVueX',
+            getLastNameUserFromVueX: 'lastNameUserFromVueX',
+            getEmailUserFromVueX: 'emailUserFromVueX',
 
+            getProfilePicUserFromVueX: 'profilePicUserFromVueX',
+        }),
     },
 
     created(){
@@ -48,11 +51,6 @@ export default {
             this.$store.dispatch('getOneUser', { userId: this.getUserIdFromVueX, token: this.getUserTokenFromVueX })
         }
     },
-
-
-    methods:{
-
-    }
 }
 </script>
 

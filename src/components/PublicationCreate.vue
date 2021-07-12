@@ -22,7 +22,8 @@
 </template>
 
 <script>
-import axios from 'axios';
+import { mapState } from 'vuex';
+
 
 export default {
     name: 'PublicationCreate',
@@ -37,44 +38,30 @@ export default {
         }
     },
 
-    props: {
-
-    },
-
-    mounted(){
-
-    },
-
     computed: {
-        getUserIdFromVueX(){
-            return this.$store.state.userIdFromVueX;
-        },
-
-        getUserTokenFromVueX(){
-            return this.$store.state.tokenUserFromVueX;
-        },
+        ...mapState({
+            getUserIdFromVueX: 'userIdFromVueX',
+            getUserTokenFromVueX: 'tokenUserFromVueX',
+        }),
     },
 
     methods:{
 
+
         createNewPublication(){
+            
             let formData = new FormData()
             formData.append('userId', this.getUserIdFromVueX);
             formData.append('message', this.message);
             formData.append('image', this.selectedFile);
 
-            axios.post('http://localhost:3000/api/publication',
-            formData,
-            { headers: {'Content-Type': 'multipart/form-data', Authorization: `Bearer ${this.getUserTokenFromVueX}`}})
-            .then(() => {
-                this.message = ''
-                this.file = ''
-                this.imageTempUrl = null
-                this.selectedFile = null
-                this.$emit('updateListOfPublications')
-            })
-            .catch(error => console.log({error: error}));
+            this.$store.dispatch('createNewPublication', { formData: formData, token: this.getUserTokenFromVueX })
+            this.message = ''
+            this.file = ''
+            this.imageTempUrl = null
+            this.selectedFile = null
         },
+
 
         previewImage(event) {
             this.selectedFile = event.target.files[0]

@@ -32,11 +32,8 @@
 </template>
 
 <script>
+import userService from '../services/userService';
 
-// @ is an alias to /src
-// import HelloWorld from '@/components/HelloWorld.vue'
-
-import axios from 'axios';
 export default {
 
     data(){
@@ -120,16 +117,15 @@ export default {
             }
         },
 
+
         createUserAccount(){
-
             if(this.firstNameRegExp.test(this.inputFirstName) && this.lastNameRegExp.test(this.inputLastName) && this.emailRegExp.test(this.inputEmail) && this.passwordRegExp.test(this.inputPassword)){
-
-                axios.post('http://localhost:3000/api/user/registration', {
-                    firstName: this.uppercaseFirstLetter(this.inputFirstName.trim().toLowerCase()),
-                    lastName: this.inputLastName.trim().toUpperCase(),
-                    email: this.inputEmail.toLowerCase().trim(),
-                    password: this.inputPassword
-                })
+                userService.registration(
+                    this.uppercaseFirstLetter(this.inputFirstName.trim().toLowerCase()),
+                    this.inputLastName.trim().toUpperCase(),
+                    this.inputEmail.toLowerCase().trim(),
+                    this.inputPassword
+                )
                 .then(response => {
                     this.successMsgRegistration = response.data.message;
 

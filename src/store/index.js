@@ -2,6 +2,8 @@ import { createStore } from 'vuex';
 
 import userService from '../services/userService';
 import sessionService from '../services/sessionService';
+import publicationService from '../services/publicationService';
+
 
 export default createStore({
     
@@ -11,26 +13,28 @@ export default createStore({
         userIdFromVueX: 0,
         tokenUserFromVueX: JSON.parse(localStorage.getItem('groupomania_token')) || '',
 
-        // User Data
+        // User Data General
         firstNameUserFromVueX: '',
         lastNameUserFromVueX: '',
         emailUserFromVueX: '',
+        isAdminUserFromVueX: 0,
 
-        // Profile Pic
+        // User Profile Pic
         profilePicUserFromVueX: '',
         successMsgProfilePicUserFromVueX: '',
         errorMsgProfilePicUserFromVueX: '',
 
-        // Bio
+        // User Bio
         bioUserFromVueX: '',
         successMsgBioUserFromVueX: '',
         errorMsgBioUserFromVueX: '',
 
-        // Password
+        // User Password
         successMsgPasswordUserFromVueX: '',
         errorMsgPasswordUserFromVueX: '',
 
-
+        // User Publication
+        listOfPublicationsFromVueX: [],
     },
     getters: {
 
@@ -60,7 +64,9 @@ export default createStore({
             state.emailUserFromVueX = String(payload);
         },
 
-
+        SET_IS_ADMIN_USER_FROM_VUEX(state, payload){
+            state.isAdminUserFromVueX = String(payload);
+        },
 
 
         SET_PROFILE_PIC_USER_FROM_VUEX(state, payload){
@@ -100,21 +106,20 @@ export default createStore({
             state.errorMsgPasswordUserFromVueX = payload;
         },
 
+        SET_LIST_OF_PUBLICATIONS_FROM_VUEX(state, payload){
+            state.listOfPublicationsFromVueX = payload;
+        },
     },
 
     actions: {
+
+        // LOGIN & REGISTRATION
+        
         setMode(context, payload){
             context.commit('SET_MODE_FROM_VUEX', payload);
         },
 
-        getUserId(context, token){
-            sessionService.getOneUserSession(token)
-            .then(res => {
-
-                context.commit('SET_USER_ID_FROM_VUEX', res.data.user_id_session)
-            })
-            .catch(err => console.log(err.message));
-        },
+        // USER
 
         getOneUser(context, payload){
             userService.getOneUser(payload.userId, payload.token)
@@ -124,6 +129,7 @@ export default createStore({
                 context.commit('SET_EMAIL_USER_FROM_VUEX', res.data.email_user)
                 context.commit('SET_PROFILE_PIC_USER_FROM_VUEX', res.data.profile_pic_user)
                 context.commit('SET_BIO_USER_FROM_VUEX', res.data.bio_user)
+                context.commit('SET_IS_ADMIN_USER_FROM_VUEX', res.data.is_admin)
             })
             .catch(err => console.log(err.message));
         },
@@ -165,6 +171,78 @@ export default createStore({
             .catch(err => {
                 context.commit('SET_ERROR_MSG_PASSWORD_USER_FROM_VUEX', err.response.data.errorMessage)
                 context.commit('SET_SUCCESS_MSG_PASSWORD_USER_FROM_VUEX', '')
+            });
+        },
+
+        deleteOneUserAccount(context, payload){
+            userService.deleteOneUserAccount(payload.userId, payload.token)
+            .then(res => {
+                console.log(res.data.successMessage)
+            })
+            .catch(err => {
+                console.log(err.response.data.errorMessage)
+            });
+        },
+
+
+        // SESSION
+
+        getUserId(context, token){
+            sessionService.getOneUserSession(token)
+            .then(res => {
+                context.commit('SET_USER_ID_FROM_VUEX', res.data.user_id_session)
+            })
+            .catch(err => console.log(err.message));
+        },
+
+        deleteUserSession(context, payload){
+            sessionService.deleteUserSession(payload.userId, payload.token)
+            .then(res => {
+                console.log(res.data.successMessage)
+            })
+            .catch(err => {
+                console.log(err.response.data.errorMessage)
+            });
+        },
+
+
+        // PUBLICATION
+
+        getAllPublications(context, payload){
+            publicationService.getAllPublications(payload.token)
+            .then(res => {
+                context.commit('SET_LIST_OF_PUBLICATIONS_FROM_VUEX', res.data)
+            })
+            .catch(err => console.log(err.message));
+        },
+
+        createNewPublication(context, payload){
+            publicationService.createNewPublication(payload.formData, payload.token)
+            .then(() => {
+
+                publicationService.getAllPublications(payload.token)
+                .then(res => {
+                    context.commit('SET_LIST_OF_PUBLICATIONS_FROM_VUEX', res.data)
+                })
+                .catch(err => console.log(err.message));
+            })
+            .catch(err => {
+                console.log(err)
+            });
+        },
+
+        deleteOnePublication(context, payload){
+            publicationService.deleteOnePublication(payload.publicationId, payload.userId, payload.token)
+            .then(() => {
+
+                publicationService.getAllPublications(payload.token)
+                .then(res => {
+                    context.commit('SET_LIST_OF_PUBLICATIONS_FROM_VUEX', res.data)
+                })
+                .catch(err => console.log(err.message));
+            })
+            .catch(err => {
+                console.log(err)
             });
         },
     },

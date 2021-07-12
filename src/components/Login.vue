@@ -25,13 +25,14 @@
 
 <script>
 
-import axios from 'axios';
+import userService from '../services/userService';
+import sessionService from '../services/sessionService';
+
 export default {
 
     data(){
 
         return {
-
             inputEmail: '',
             inputPassword: '',
 
@@ -55,62 +56,28 @@ export default {
     },
 
     methods: {
-        getTokenFromLocalStorage(){
-            return JSON.parse(localStorage.getItem('groupomania_token'))
-        },
-
-        setTokenFromLocalStorage(token){
-            localStorage.setItem('groupomania_token', JSON.stringify(token))
-        },
-
-        setUserIdFromLocalStorage(userId){
-            localStorage.setItem('groupomania_userId', JSON.stringify(userId))
-        }, 
-
-        setIsAdminFromLocalStorage(isAdmin){
-            localStorage.setItem('groupomania_isAdmin', JSON.stringify(isAdmin))
-        },  
 
         switchMode(){
             this.$store.dispatch('setMode', 'createAccount')
         },
 
-        setUserSession(){
-            axios.post(`http://localhost:3000/api/session`,{},{
-                headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage() }`}
-            })
-            .then(res => console.log(res))
-            .catch(err => {
-                console.log(err.response);
-            })
-        },
-
         login(){
-
             if(this.emailRegExp.test(this.inputEmail) && this.passwordRegExp.test(this.inputPassword)){
 
-                axios.post('http://localhost:3000/api/user/login', { 
-                    email: this.inputEmail.trim(),
-                    password: this.inputPassword 
-                })
-                .then(response => {
-                    console.log(response)
-
+                userService.login(this.inputEmail.trim(), this.inputPassword)
+                .then(res => {
                     this.errorMsgLogin = null;
-                    this.successMsgLogin = response.data.message;
+                    this.successMsgLogin = res.data.message;
 
-
-                    this.setTokenFromLocalStorage(response.data.token);
-
-                    this.setUserSession()
+                    this.setTokenFromLocalStorage(res.data.token);
+                    this.setUserSession(res.data.userId, res.data.token)
 
                     window.location.href = 'http://localhost:8080/news';
-                    
                 })
-                .catch(error => {
-                    console.log(error.response.data);
+                .catch(err => {
+                    console.log(err.response);
 
-                    this.errorMsgLogin = error.response.data.notValid;
+                    this.errorMsgLogin = err.response.data.notValid;
                     this.inputPassword = ''
                 })
 
@@ -118,12 +85,25 @@ export default {
                 this.errorMsgLogin = 'Email ou mot de passe incorrect.';
                 this.inputPassword = ''
             }
-        }
+        },
+
+        setUserSession(userId, token){
+            sessionService.setUserSession(userId, token)
+            .then(res => {
+                console.log(res)
+            })
+            .catch(err => {
+                console.log(err.response);
+            })
+        },
+
+        setTokenFromLocalStorage(token){
+            localStorage.setItem('groupomania_token', JSON.stringify(token))
+        },
+
     },
 }
 </script>
-
-
 
 
 <style scoped lang="scss">

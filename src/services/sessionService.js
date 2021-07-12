@@ -10,4 +10,17 @@ export default {
         });
     },
 
+    setUserSession(userId, token){
+        return axios.post(`${baseUrl}/session`, 
+            {userId: userId, token: token }, 
+            { headers: { Authorization: `Bearer ${token}`} }
+        );
+    },
+
+    deleteUserSession(userId, token){
+        return axios.delete(`${baseUrl}/session/${userId}`, { 
+            data: { userId: userId },
+            headers: { Authorization: `Bearer ${token}`}
+        });
+    },
 };

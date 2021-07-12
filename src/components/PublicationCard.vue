@@ -16,7 +16,7 @@
                                 <p class="info-publication__date">{{ publicationData.createdAt }}</p>
                             </div>        
                             <div class="delete-publication">
-                                <img class="delete-publication__icon" width="15" src="../assets/times-solid.svg" v-if="getUserIdFromVueX == publicationData.user_id_publication || userIsAdmin == 1" @click="deletePublication()" alt="bouton supprimer">
+                                <img class="delete-publication__icon" width="15" src="../assets/times-solid.svg" v-if="getUserIdFromVueX == publicationData.user_id_publication || getIsAdminUserFromVueX == 1" @click="deletePublication()" alt="bouton supprimer">
                             </div>  
                         </header> 
                         <section class="content-publication">
@@ -64,7 +64,7 @@
             <section class="section-comment-publication">
                 <div class="new-comment">
                     <div class="profile-pic-user">
-                        <img class="profile-pic-user__img" :src="profilePicUser" alt="image de profil">
+                        <img class="profile-pic-user__img" :src="getProfilePicUserFromVueX" alt="image de profil">
                     </div>
                     <div class="add-new-comment">
                         <textarea v-model="addNewComment" class="add-new-comment__input" placeholder="Ecrivez un commentaire..."></textarea>
@@ -93,7 +93,7 @@
                         </div>
 
                         <div class="delete-comment">
-                            <img class="delete-comment__icon" src="../assets/times-solid.svg" alt="icone supprimer" v-if="getUserIdFromVueX == comment.user_id_comment || userIsAdmin == 1" @click="deleteOneComment(comment.id)">
+                            <img class="delete-comment__icon" src="../assets/times-solid.svg" alt="icone supprimer" v-if="getUserIdFromVueX == comment.user_id_comment || getIsAdminUserFromVueX == 1" @click="deleteOneComment(comment.id)">
                         </div>
                     </div>
                 </div>
@@ -104,9 +104,10 @@
 
 <script>
 import publicationService from '../services/publicationService';
-import axios from 'axios';
+import commentService from '../services/commentService';
+import userService from '../services/userService';
 
-import { mapGetters } from 'vuex';
+import { mapState } from 'vuex';
 
 export default {
     name: 'Publication',
@@ -139,9 +140,15 @@ export default {
     },
 
     computed: {
-        ...mapGetters({
-            getUserIdFromVueX: 'getUserId',
-            getUserTokenFromVueX: 'getTokenUser'
+        ...mapState({
+            getUserIdFromVueX: 'userIdFromVueX',
+            getUserTokenFromVueX: 'tokenUserFromVueX',
+            getPublicationFromVueX: 'publicationFromVueX',
+
+            getFirstNameUserFromVueX: 'firstNameUserFromVueX',
+            getLastNameUserFromVueX: 'lastNameUserFromVueX',
+            getProfilePicUserFromVueX: 'profilePicUserFromVueX',
+            getIsAdminUserFromVueX: 'isAdminUserFromVueX',
         }),
 
         urlPublication(){
@@ -154,10 +161,10 @@ export default {
         this.getLikesOfOnePublication();
         this.getPublicationsLikedByOneUser();
         this.getCommentsOfOnePublication();
-        this.getUserLoggedInformations();
     },
 
     methods:{
+
         getOnePublication(){
             publicationService.getOnePublication(this.publicationId ,this.getUserTokenFromVueX)
             .then(res => {
@@ -166,45 +173,26 @@ export default {
             })
             .catch(err => console.log(err.response));
         },
-        
 
         deletePublication(){
             const confirmMsgDeletePublication = confirm('Etes-vous sûr de vouloir supprimer votre publication ? Attention, cette action est irreversible.')
-
             if(confirmMsgDeletePublication == true){
-
-                publicationService.deleteOnePublication(this.publicationId, this.getUserIdFromVueX, this.getUserTokenFromVueX)
-                .then(() => {
-                    this.$emit('updateListOfPublications');
-                })
-                .catch(err => console.log(err.response));
-
+                this.$store.dispatch('deleteOnePublication', { publicationId: this.publicationId, userId: this.getUserIdFromVueX, token: this.getUserTokenFromVueX })
             } else {
                 alert('Suppression annulée.');              
             }
         },
 
-
-
         getLikesOfOnePublication(){
-            // Get likes of one publication
-            axios.get(`http://localhost:3000/api/like-publication/publication/${this.publicationId}`,{
-                headers: { Authorization: `Bearer ${this.getUserTokenFromVueX}` }
-            })
+            publicationService.getLikesOfOnePublication(this.publicationId, this.getUserTokenFromVueX)
             .then(res => {
                 this.likesPublication = res.data;
-            }) 
-            .catch(error => {
-                console.log(error.response);
             })
+            .catch(err => console.log(err.response));
         },
 
-
         getPublicationsLikedByOneUser(){
-            // Get Publications Liked by one user
-            axios.get(`http://localhost:3000/api/like-publication/user/${this.getUserIdFromVueX}`,{
-                headers: { Authorization: `Bearer ${this.getUserTokenFromVueX}` }
-            })
+            userService.getAllLikesOfOneUser(this.getUserIdFromVueX, this.getUserTokenFromVueX)
             .then(res => {
                 this.arrayPublicationLikedByUser = []
 
@@ -212,101 +200,50 @@ export default {
                     this.arrayPublicationLikedByUser.push(res.data[i].publication_id)
                 }
                 localStorage.setItem('groupomania_publicationsLiked', JSON.stringify(this.arrayPublicationLikedByUser))
-            }) 
-            .catch(error => {
-                console.log(error.response);
             })
+            .catch(err => console.log(err.response));
         },
 
-
         onLikePublication(){
-            axios.post(`http://localhost:3000/api/like-publication/publication/${this.publicationId}`,
-            { userId: this.getUserIdFromVueX },
-            { headers: { Authorization: `Bearer ${this.getUserTokenFromVueX }`}})
+            publicationService.addOneLikeToggle(this.publicationId, this.getUserIdFromVueX, this.getUserTokenFromVueX)
             .then(() => {
                 this.getLikesOfOnePublication();
                 this.getPublicationsLikedByOneUser();
             })
-            .catch(err => {
-                console.log(err.response);
-            })
+            .catch(err => console.log(err.response));
         },
 
         getCommentsOfOnePublication(){
-            axios.get(`http://localhost:3000/api/comment/publication/${this.publicationId}`,{
-                headers: { Authorization: `Bearer ${this.getUserTokenFromVueX}` }
-            })
+            commentService.getCommentsOfOnePublication(this.publicationId, this.getUserTokenFromVueX)
             .then(res => {
                 this.comments = res.data;
-            }) 
-            .catch(error => {
-                console.log(error.response);
             })
+            .catch(err => console.log(err.response));
         },
 
         publishNewComment(){
-            axios.post(`http://localhost:3000/api/comment/publication/${this.publicationId}`, 
-            { userId: this.getUserIdFromVueX, comment: this.addNewComment },
-            { headers: { Authorization: `Bearer ${this.getUserTokenFromVueX }`}})
-            .then(res => {
-                console.log(res);
+            commentService.createNewComment(this.publicationId, this.getUserIdFromVueX, this.addNewComment, this.getUserTokenFromVueX)
+            .then(() => {
+                this.getCommentsOfOnePublication()
                 this.addNewComment = ''
-
-                axios.get(`http://localhost:3000/api/comment/publication/${this.publicationId}`,{
-                    headers: { Authorization: `Bearer ${this.getUserTokenFromVueX}` }
-                })
-                .then(res => {
-                    this.comments = res.data;
-                }) 
-                .catch(error => {
-                    console.log(error.response);
-                })
             })
-            .catch(err => {
-                console.log(err.response);
-            })
+            .catch(err => console.log(err.response));
         },
-
 
         deleteOneComment(commentId){
             const confirmMsgDeletePublication = confirm('Etes-vous sûr de vouloir supprimer votre commentaire ? Attention, cette action est irreversible.')
 
-            if(confirmMsgDeletePublication == true){
-
-                axios.delete(`http://localhost:3000/api/comment/${commentId}`, 
-                { data: { userId: this.getUserIdFromVueX },
-                headers: { Authorization: `Bearer ${this.getUserTokenFromVueX}`}})
+            if(confirmMsgDeletePublication){
+                commentService.deleteOneComment(commentId, this.getUserIdFromVueX, this.getUserTokenFromVueX)
                 .then(() => {
-
-                    axios.get(`http://localhost:3000/api/comment/publication/${this.publicationId}`,{
-                        headers: { Authorization: `Bearer ${this.getUserTokenFromVueX}` }
-                    })
-                    .then(res => {
-                        this.comments = res.data;
-                    }) 
-                    .catch(error => {
-                        console.log(error.resonse);
-                    })
+                    this.getCommentsOfOnePublication()
                 })
-                .catch(err => {
-                    console.log(err.response);
-                })
+                .catch(err => console.log(err.response));
             } else {
                 alert('Suppression annulée.');
             }
         },
 
-        getUserLoggedInformations(){
-            axios.get(`http://localhost:3000/api/user/${this.getUserIdFromVueX}`,{
-                headers: { Authorization: `Bearer ${this.getUserTokenFromVueX }`}
-            })
-            .then(response => {
-                this.userIsAdmin = response.data.is_admin;
-                this.profilePicUser = response.data.profile_pic_user;
-            })
-            .catch(error => console.log(error.response))
-        },   
-        
         onSharePublication(){
             this.showUrlPublication = !this.showUrlPublication;
             this.shareLinkIsClicked = false;

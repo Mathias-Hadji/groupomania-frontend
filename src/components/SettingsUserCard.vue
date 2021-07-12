@@ -69,7 +69,6 @@
 </template>
 
 <script>
-import axios from 'axios';
 import { mapState } from 'vuex';
 
 export default {
@@ -139,7 +138,6 @@ export default {
         },
 
         modifyProfilePic(){
-            
             let formData = new FormData();
             formData.append('userId', this.getUserIdFromVueX);
             formData.append('image', this.selectedFile);
@@ -151,6 +149,23 @@ export default {
             this.$store.dispatch('modifyPasswordUser', { userId: this.getUserIdFromVueX, token: this.getUserTokenFromVueX, currentPassword: this.inputUserCurrentPassword, newPassword: this.inputUserNewPassword})
             this.inputUserCurrentPassword = ''
             this.inputUserNewPassword = ''
+        },
+
+        deleteAccount(){
+            const confirmMsgDeleteAccount = confirm('Attention, cette action est irreversible. Etes-vous sûr de vouloir supprimer votre compte ?')
+
+            if(confirmMsgDeleteAccount){
+                this.$store.dispatch('deleteOneUserAccount', { userId: this.getUserIdFromVueX, token: this.getUserTokenFromVueX })
+
+                this.deleteUserSession();
+
+                window.localStorage.removeItem('groupomania_token');
+                window.localStorage.removeItem('groupomania_publicationsLiked');
+
+                window.location.href = '/';
+            } else {
+                alert('Suppression de votre compte annulée.')
+            }
         },
 
 
@@ -175,73 +190,12 @@ export default {
             }
         },
 
-
-        modifyProfilePicOld(){
-            
-            let formData = new FormData();
-            formData.append('userId', this.getUserIdFromVueX);
-            formData.append('image', this.selectedFile);
-
-            axios.put(`http://localhost:3000/api/user/profile-pic/${this.getUserIdFromVueX}`, formData, { 
-                headers: {'Content-Type': 'multipart/form-data', Authorization: `Bearer ${this.getUserTokenFromVueX}`}
-            })
-            .then(response => {
-                this.errorMsgProfilePic = null;
-                this.successMsgProfilePic = response.data.message;
-
-                axios.get(`http://localhost:3000/api/user/${this.getUserIdFromVueX}`,{
-                    headers: { Authorization: `Bearer ${this.getUserTokenFromVueX }`}
-                })
-                .then(response => {
-                    this.validBtnProfilePic = false;
-                    this.profilePicUser = response.data.profile_pic_user;
-                })
-                .catch(error => { 
-                    console.log(error.response);
-                })
-
-            })
-            .catch(error => {
-                this.successMsgProfilePic = null;
-                console.log(error.response);
-            });
+        deleteUserSession(){
+            this.$store.dispatch('deleteUserSession', { userId: this.getUserIdFromVueX, token: this.getUserTokenFromVueX })
         },
-
 
         cancelModifyProfilePic(){
             this.reloadPage()
-        },
-
-
-        deleteAccount(){
-            const confirmMsgDeleteAccount = confirm('Attention, cette action est irreversible. Etes-vous sûr de vouloir supprimer votre compte ?')
-
-            if(confirmMsgDeleteAccount == true){
-                axios.delete(`http://localhost:3000/api/user/delete-account/${this.getUserIdFromVueX}`, {
-                    headers: { Authorization: `Bearer ${this.getUserTokenFromVueX}`}
-                })
-                .then(() => {
-
-                    this.deleteUserSession();
-
-                    window.localStorage.removeItem('groupomania_token');
-                    window.localStorage.removeItem('groupomania_publicationsLiked');
-
-                    window.location.href = '/';
-
-                })
-                .catch(error => console.log(error.response))
-            } else {
-                alert('Suppression de votre compte annulée.')
-            }
-        },
-
-        deleteUserSession(){
-            axios.delete(`http://localhost:3000/api/session`, {
-                headers: { Authorization: `Bearer ${this.getUserTokenFromVueX }`}
-            })
-            .then()
-            .catch(error => console.log(error.response))
         },
 
         reloadPage(){

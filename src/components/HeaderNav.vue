@@ -17,7 +17,7 @@
             </div>
 
             <div class="link">
-                <router-link @click="onClickDisconected()" to="/"><img src="../assets/power-off-solid.svg" class="nav-link__item" alt="Se deconnecter"></router-link>
+                <router-link @click="onClickDisconected" to="/"><img src="../assets/power-off-solid.svg" class="nav-link__item" alt="Se deconnecter"></router-link>
             </div>
         </div>  
     </nav>
@@ -25,7 +25,6 @@
 </template>
 
 <script>
-import axios from 'axios';
 
 import { mapState } from 'vuex';
 
@@ -39,8 +38,8 @@ export default {
 
     computed:{
         ...mapState({
-            getUserTokenFromVueX: 'tokenUserFromVueX',
             getUserIdFromVueX: 'userIdFromVueX',
+            getUserTokenFromVueX: 'tokenUserFromVueX',
             getProfilePicUserFromVueX: 'profilePicUserFromVueX',
         }),
 
@@ -49,16 +48,11 @@ export default {
     methods:{
 
         onClickDisconected(){
-            axios.delete(`http://localhost:3000/api/session`, {
-                headers: { Authorization: `Bearer ${this.getUserTokenFromVueX}`}
-            })
-            .then(() => {
-                window.localStorage.removeItem('groupomania_token');
-                window.localStorage.removeItem('groupomania_publicationsLiked');
-                
-                window.location.href = 'http://localhost:8080';
-            })
-            .catch(error => console.log(error.response))
+            this.$store.dispatch('deleteUserSession', { userId: this.getUserIdFromVueX, token: this.getUserTokenFromVueX })
+
+            window.localStorage.removeItem('groupomania_token');
+            window.localStorage.removeItem('groupomania_publicationsLiked');
+            window.location.href = 'http://localhost:8080';
         },
     }
 }
