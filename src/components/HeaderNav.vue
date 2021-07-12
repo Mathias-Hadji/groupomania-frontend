@@ -27,6 +27,7 @@
 <script>
 
 import { mapState } from 'vuex';
+import sessionService from '../services/sessionService';
 
 export default {
 
@@ -42,17 +43,20 @@ export default {
             getUserTokenFromVueX: 'tokenUserFromVueX',
             getProfilePicUserFromVueX: 'profilePicUserFromVueX',
         }),
-
     },
 
     methods:{
-
         onClickDisconected(){
-            this.$store.dispatch('deleteUserSession', { userId: this.getUserIdFromVueX, token: this.getUserTokenFromVueX })
 
-            window.localStorage.removeItem('groupomania_token');
-            window.localStorage.removeItem('groupomania_publicationsLiked');
-            window.location.href = 'http://localhost:8080';
+            sessionService.deleteUserSession(this.getUserIdFromVueX, this.getUserTokenFromVueX)
+            .then(() => {
+                window.localStorage.removeItem('groupomania_token');
+                window.localStorage.removeItem('groupomania_publicationsLiked');
+                window.location.href = 'http://localhost:8080';
+            })
+            .catch(err => {
+                console.log(err)
+            });
         },
     }
 }

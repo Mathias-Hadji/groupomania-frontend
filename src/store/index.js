@@ -8,30 +8,19 @@ import publicationService from '../services/publicationService';
 export default createStore({
     
     state: {
+
+        // Mode login & registration
         modeFromVueX: 'login',
-        
+
+        // User Data
         userIdFromVueX: 0,
         tokenUserFromVueX: JSON.parse(localStorage.getItem('groupomania_token')) || '',
-
-        // User Data General
         firstNameUserFromVueX: '',
         lastNameUserFromVueX: '',
         emailUserFromVueX: '',
         isAdminUserFromVueX: 0,
-
-        // User Profile Pic
         profilePicUserFromVueX: '',
-        successMsgProfilePicUserFromVueX: '',
-        errorMsgProfilePicUserFromVueX: '',
-
-        // User Bio
         bioUserFromVueX: '',
-        successMsgBioUserFromVueX: '',
-        errorMsgBioUserFromVueX: '',
-
-        // User Password
-        successMsgPasswordUserFromVueX: '',
-        errorMsgPasswordUserFromVueX: '',
 
         // User Publication
         listOfPublicationsFromVueX: [],
@@ -41,69 +30,39 @@ export default createStore({
     },
     mutations: {
         SET_MODE_FROM_VUEX(state, payload){
-            state.modeFromVueX = String(payload);
+            state.modeFromVueX = payload;
         },
 
         SET_USER_ID_FROM_VUEX(state, payload){
-            state.userIdFromVueX =  Number(payload);
+            state.userIdFromVueX = payload;
         },
 
         SET_TOKEN_USER_FROM_VUEX(state, payload){
-            state.tokenUserFromVueX = String(payload);
+            state.tokenUserFromVueX = payload;
         },
 
         SET_FIRST_NAME_USER_FROM_VUEX(state, payload){
-            state.firstNameUserFromVueX = String(payload);
+            state.firstNameUserFromVueX = payload;
         },
 
         SET_LAST_NAME_USER_FROM_VUEX(state, payload){
-            state.lastNameUserFromVueX = String(payload);
+            state.lastNameUserFromVueX = payload;
         },
 
         SET_EMAIL_USER_FROM_VUEX(state, payload){
-            state.emailUserFromVueX = String(payload);
+            state.emailUserFromVueX = payload;
         },
 
         SET_IS_ADMIN_USER_FROM_VUEX(state, payload){
-            state.isAdminUserFromVueX = String(payload);
+            state.isAdminUserFromVueX = payload;
         },
-
 
         SET_PROFILE_PIC_USER_FROM_VUEX(state, payload){
             state.profilePicUserFromVueX = payload;
         },
 
-        SET_SUCCESS_MSG_PROFILE_PIC_USER_FROM_VUEX(state, payload){
-            state.successMsgProfilePicUserFromVueX = payload;
-        },
-
-        SET_ERROR_MSG_PROFILE_PIC_USER_FROM_VUEX(state, payload){
-            state.errorMsgProfilePicUserFromVueX = payload;
-        },
-
-
-
-
         SET_BIO_USER_FROM_VUEX(state, payload){
-            state.bioUserFromVueX = String(payload);
-        },
-
-        SET_SUCCESS_MSG_BIO_FROM_VUEX(state, payload){
-            state.successMsgBioUserFromVueX = payload;
-        },
-
-        SET_ERROR_MSG_BIO_FROM_VUEX(state, payload){
-            state.errorMsgBioUserFromVueX = payload;
-        },
-
-
-
-        SET_SUCCESS_MSG_PASSWORD_USER_FROM_VUEX(state, payload){
-            state.successMsgPasswordUserFromVueX = payload;
-        },
-
-        SET_ERROR_MSG_PASSWORD_USER_FROM_VUEX(state, payload){
-            state.errorMsgPasswordUserFromVueX = payload;
+            state.bioUserFromVueX = payload;
         },
 
         SET_LIST_OF_PUBLICATIONS_FROM_VUEX(state, payload){
@@ -114,7 +73,7 @@ export default createStore({
     actions: {
 
         // LOGIN & REGISTRATION
-        
+
         setMode(context, payload){
             context.commit('SET_MODE_FROM_VUEX', payload);
         },
@@ -134,57 +93,6 @@ export default createStore({
             .catch(err => console.log(err.message));
         },
 
-
-        modifyProfilePicUser(context, payload){
-            userService.modifyProfilePicUser(payload.userId, payload.formData, payload.token)
-            .then(res => {
-                context.commit('SET_PROFILE_PIC_USER_FROM_VUEX', res.data.profilePic)
-                context.commit('SET_SUCCESS_MSG_PROFILE_PIC_USER_FROM_VUEX', res.data.successMessage)
-                context.commit('SET_ERROR_MSG_PROFILE_PIC_USER_FROM_VUEX', '')
-            })
-            .catch(err => {
-                context.commit('SET_ERROR_MSG_PROFILE_PIC_USER_FROM_VUEX', err.response.data.errorMessage)
-                context.commit('SET_SUCCESS_MSG_PROFILE_PIC_USER_FROM_VUEX', '')
-            });
-        },
-        
-
-        modifyBioUser(context, payload){
-            userService.modifyBioUser(payload.userId, payload.token, payload.bioUser)
-            .then(res => {
-                context.commit('SET_BIO_USER_FROM_VUEX', res.data.bio)
-                context.commit('SET_SUCCESS_MSG_BIO_FROM_VUEX', res.data.successMessage)
-                context.commit('SET_ERROR_MSG_BIO_FROM_VUEX', '')
-            })
-            .catch(err => {
-                context.commit('SET_ERROR_MSG_BIO_FROM_VUEX', err.response.data.errorMessage)
-                context.commit('SET_SUCCESS_MSG_BIO_FROM_VUEX', '')
-            });
-        },
-
-        modifyPasswordUser(context, payload){
-            userService.modifyPasswordUser(payload.userId, payload.token, payload.currentPassword, payload.newPassword)
-            .then(res => {
-                context.commit('SET_SUCCESS_MSG_PASSWORD_USER_FROM_VUEX', res.data.successMessage)
-                context.commit('SET_ERROR_MSG_PASSWORD_USER_FROM_VUEX', '')
-            })
-            .catch(err => {
-                context.commit('SET_ERROR_MSG_PASSWORD_USER_FROM_VUEX', err.response.data.errorMessage)
-                context.commit('SET_SUCCESS_MSG_PASSWORD_USER_FROM_VUEX', '')
-            });
-        },
-
-        deleteOneUserAccount(context, payload){
-            userService.deleteOneUserAccount(payload.userId, payload.token)
-            .then(res => {
-                console.log(res.data.successMessage)
-            })
-            .catch(err => {
-                console.log(err.response.data.errorMessage)
-            });
-        },
-
-
         // SESSION
 
         getUserId(context, token){
@@ -192,16 +100,10 @@ export default createStore({
             .then(res => {
                 context.commit('SET_USER_ID_FROM_VUEX', res.data.user_id_session)
             })
-            .catch(err => console.log(err.message));
-        },
-
-        deleteUserSession(context, payload){
-            sessionService.deleteUserSession(payload.userId, payload.token)
-            .then(res => {
-                console.log(res.data.successMessage)
-            })
             .catch(err => {
-                console.log(err.response.data.errorMessage)
+                if(err.response.status === 404 || err.response.status === 401){
+                    window.location.href = 'http://localhost:8080';
+                }
             });
         },
 

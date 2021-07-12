@@ -21,8 +21,7 @@
                         <button @click="modifyProfilePic" class="btn-profile-pic__btn button-primary">Valider</button>
                         <button @click="cancelModifyProfilePic" class="btn-profile-pic__btn button-danger">Annuler</button>
                     </div>
-                    <p v-if="getSuccessMsgProfilePicUserFromVueX != null" class="section-profile-pic__success-message text-success">{{ getSuccessMsgProfilePicUserFromVueX }}</p> 
-                    <p v-if="getErrorMsgProfilePicUserFromVueX != null" class="section-profile-pic__error-message text-danger">{{ getErrorMsgProfilePicUserFromVueX }}</p>
+                    <p v-if="successMsgProfilePic != null" class="section-profile-pic__success-message text-success">{{ successMsgProfilePic }}</p> 
                 </section>
 
                 <section class="section-user-information">
@@ -30,13 +29,13 @@
                         <h2 class="user-information__title">Email</h2>
                         <p>{{ getEmailUserFromVueX }}</p>
                     </div> 
+
                     <div class="user-bio">
                         <h2 class="user-bio__title">Bio</h2>
                         <p class="user-bio__content-bio">{{ getBioUserFromVueX }}</p>
                         <textarea v-model="inputBioUser" class="user-bio__message-input" rows="5" maxlength="255" placeholder="Ajouter un texte ..."></textarea>
                         <button @click="modifyBioUser" class="button">Modifier ma bio</button>
-                        <p v-if="getSuccessMsgBioUserFromVueX != null" class="user-bio__success-message text-success">{{ getSuccessMsgBioUserFromVueX }}</p> 
-                        <p v-if="getErrorMsgBioUserFromVueX != null" class="user-bio__error-message text-danger">{{ getErrorMsgBioUserFromVueX }}</p>   
+                        <p v-if="successMsgInputBioUser != null" class="user-bio__success-message text-success">{{ successMsgInputBioUser }}</p> 
                     </div>
                 </section>
             </section>
@@ -53,8 +52,8 @@
                         <label class="update-password__label" for="new-password">Nouveau mot de passe :</label>
                         <input v-model="inputUserNewPassword" class="update-password__input" type="password" name="new-password" required>
                         <button @click="modifyPassword" v-bind:disabled="btnDisabled == true" v-bind:class="{'button--disabled' : btnDisabled}" class="button">Valider</button>
-                        <p v-if="getErrorMsgPasswordUserFromVueX != null" class="update-password__error-message text-danger">{{ getErrorMsgPasswordUserFromVueX }}</p>
-                        <p v-if="getSuccessMsgPasswordUserFromVueX != null" class="update-password__success-message text-success">{{ getSuccessMsgPasswordUserFromVueX }}</p>
+                        <p v-if="errorMsgCurrentPassword != null" class="update-password__error-message text-danger">{{ errorMsgCurrentPassword }}</p>
+                        <p v-if="successMsgPassword != null" class="update-password__success-message text-success">{{ successMsgPassword }}</p>
                     </div>
                 </section>
 
@@ -70,13 +69,15 @@
 
 <script>
 import { mapState } from 'vuex';
+import userService from '../services/userService';
+import sessionService from '../services/sessionService';
 
 export default {
     data(){
         return{
 
             inputBioUser: '',
-
+            successMsgInputBioUser: null,
 
             inputUserCurrentPassword: '',
             inputUserNewPassword: '',
@@ -95,10 +96,8 @@ export default {
 
 
             successMsgProfilePic: null,
-            errorMsgProfilePic: null,
         }
     },
-
 
     computed:{
         ...mapState({
@@ -109,16 +108,9 @@ export default {
             getLastNameUserFromVueX: 'lastNameUserFromVueX',
             getEmailUserFromVueX: 'emailUserFromVueX',
 
-            getProfilePicUserFromVueX: 'profilePicUserFromVueX',
-            getSuccessMsgProfilePicUserFromVueX: 'successMsgProfilePicUserFromVueX',
-            getErrorMsgProfilePicUserFromVueX: 'errorMsgProfilePicUserFromVueX',
-
             getBioUserFromVueX: 'bioUserFromVueX',
-            getSuccessMsgBioUserFromVueX: 'successMsgBioUserFromVueX',
-            getErrorMsgBioUserFromVueX: 'errorMsgBioUserFromVueX',
 
-            getSuccessMsgPasswordUserFromVueX: 'successMsgPasswordUserFromVueX',
-            getErrorMsgPasswordUserFromVueX: 'errorMsgPasswordUserFromVueX',
+            getProfilePicUserFromVueX: 'profilePicUserFromVueX',
         }),
         
         btnDisabled(){
@@ -133,8 +125,16 @@ export default {
 
     methods:{
         modifyBioUser(){
-            this.$store.dispatch('modifyBioUser', { userId: this.getUserIdFromVueX, token: this.getUserTokenFromVueX, bioUser: this.inputBioUser })
-            this.inputBioUser = ''
+            userService.modifyBioUser(this.getUserIdFromVueX, this.getUserTokenFromVueX, this.inputBioUser)
+            .then(res => {
+                this.inputBioUser = ''
+
+                this.$store.commit('SET_BIO_USER_FROM_VUEX', res.data.bio)
+                this.successMsgInputBioUser = res.data.successMessage
+            })
+            .catch(err => {
+                console.log(err)
+            });
         },
 
         modifyProfilePic(){
@@ -142,30 +142,64 @@ export default {
             formData.append('userId', this.getUserIdFromVueX);
             formData.append('image', this.selectedFile);
 
-            this.$store.dispatch('modifyProfilePicUser', { userId: this.getUserIdFromVueX, formData: formData, token: this.getUserTokenFromVueX })
+            userService.modifyProfilePicUser(this.getUserIdFromVueX, formData, this.getUserTokenFromVueX)
+            .then(res => {
+                this.$store.commit('SET_PROFILE_PIC_USER_FROM_VUEX', res.data.profilePic)
+                this.successMsgProfilePic =  res.data.successMessage;
+            })
+            .catch(err => {
+                console.log(err)
+            });
         },
 
+
         modifyPassword(){
-            this.$store.dispatch('modifyPasswordUser', { userId: this.getUserIdFromVueX, token: this.getUserTokenFromVueX, currentPassword: this.inputUserCurrentPassword, newPassword: this.inputUserNewPassword})
-            this.inputUserCurrentPassword = ''
-            this.inputUserNewPassword = ''
+            userService.modifyPasswordUser(this.getUserIdFromVueX, this.getUserTokenFromVueX, this.inputUserCurrentPassword, this.inputUserNewPassword)
+            .then(res => {
+                this.errorMsgCurrentPassword = ''
+                this.inputUserCurrentPassword = ''
+                this.inputUserNewPassword = ''
+
+                this.successMsgPassword =  res.data.successMessage;
+            })
+            .catch(err => {
+                this.successMsgPassword =  '';
+
+                this.errorMsgCurrentPassword = err.response.data.errorMessage;
+                this.errorMsgNewPassword = err.response.data.errorMessage;
+            });
         },
 
         deleteAccount(){
             const confirmMsgDeleteAccount = confirm('Attention, cette action est irreversible. Etes-vous sûr de vouloir supprimer votre compte ?')
 
             if(confirmMsgDeleteAccount){
-                this.$store.dispatch('deleteOneUserAccount', { userId: this.getUserIdFromVueX, token: this.getUserTokenFromVueX })
 
-                this.deleteUserSession();
+                userService.deleteOneUserAccount(this.getUserIdFromVueX, this.getUserTokenFromVueX)
+                .then(() => {
+                    this.deleteUserSession();
 
-                window.localStorage.removeItem('groupomania_token');
-                window.localStorage.removeItem('groupomania_publicationsLiked');
+                    window.localStorage.removeItem('groupomania_token');
+                    window.localStorage.removeItem('groupomania_publicationsLiked');
+                    window.location.href = '/';
+                })
+                .catch(err => {
+                    console.log(err.response.data.errorMessage)
+                });
 
-                window.location.href = '/';
             } else {
                 alert('Suppression de votre compte annulée.')
             }
+        },
+
+        deleteUserSession(){
+            sessionService.deleteUserSession(this.getUserIdFromVueX, this.getUserTokenFromVueX)
+            .then(res => {
+                console.log(res.data.successMessage)
+            })
+            .catch(err => {
+                console.log(err.response.data.errorMessage)
+            });
         },
 
 
@@ -190,9 +224,7 @@ export default {
             }
         },
 
-        deleteUserSession(){
-            this.$store.dispatch('deleteUserSession', { userId: this.getUserIdFromVueX, token: this.getUserTokenFromVueX })
-        },
+
 
         cancelModifyProfilePic(){
             this.reloadPage()

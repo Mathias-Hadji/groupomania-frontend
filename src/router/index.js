@@ -1,6 +1,6 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import Home from '../views/Home.vue'
-
+import { createRouter, createWebHistory } from 'vue-router';
+import Home from '../views/Home.vue';
+import NotFoundPage from '../views/NotFoundPage.vue';
 
 const routes = [
   {
@@ -32,6 +32,9 @@ const routes = [
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "about" */ '../views/Post.vue')
   },
+  {
+    path: '/:NotFoundPage(.*)*', component: NotFoundPage
+  },
 ]
 
 const router = createRouter({
@@ -39,4 +42,4 @@ const router = createRouter({
   routes
 })
 
-export default router
+export default router;

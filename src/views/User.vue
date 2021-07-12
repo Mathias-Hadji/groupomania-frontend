@@ -33,12 +33,6 @@ export default {
         ...mapState({
             getUserIdFromVueX: 'userIdFromVueX',
             getUserTokenFromVueX: 'tokenUserFromVueX',
-            
-            getFirstNameUserFromVueX: 'firstNameUserFromVueX',
-            getLastNameUserFromVueX: 'lastNameUserFromVueX',
-            getEmailUserFromVueX: 'emailUserFromVueX',
-
-            getProfilePicUserFromVueX: 'profilePicUserFromVueX',
         }),
     },
 
@@ -51,6 +45,7 @@ export default {
             this.$store.dispatch('getOneUser', { userId: this.getUserIdFromVueX, token: this.getUserTokenFromVueX })
         }
     },
+
 }
 </script>
 

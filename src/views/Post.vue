@@ -1,10 +1,10 @@
 <template>
     <div>
-        <nav class="main-navbar" v-if="dataLoaded">
+        <nav class="main-navbar">
             <HeaderNav/>
         </nav>
 
-        <main class="post" v-if="dataLoaded">
+        <main class="post">
             <PublicationCard
                 v-bind:publicationId = getIdPublicationFromUrl()
             />
@@ -16,7 +16,7 @@
 
 
 <script>
-import axios from 'axios';
+import { mapState } from 'vuex';
 
 import HeaderNav from '@/components/HeaderNav.vue';
 import PublicationCard from '../components/PublicationCard'
@@ -32,48 +32,32 @@ export default {
 
     data(){
         return{
-            dataLoaded: false
+            
         }
     },
 
-    mounted(){
-        this.getUserId()
-        this.setUserTokenInVueX()
+    computed:{
+        ...mapState({
+            getUserIdFromVueX: 'userIdFromVueX',
+            getUserTokenFromVueX: 'tokenUserFromVueX',
+        }),
     },
 
-    computed: {
-
+    created(){
+        this.$store.dispatch('getUserId', this.getUserTokenFromVueX)
     },
+
+    watch: {
+        getUserIdFromVueX: function(){
+            this.$store.dispatch('getOneUser', { userId: this.getUserIdFromVueX, token: this.getUserTokenFromVueX })
+        }
+    },
+
 
     methods:{
-
-        getUserId(){
-            axios.get(`http://localhost:3000/api/session/${this.getTokenFromLocalStorage()}`,{
-                headers: { Authorization: `Bearer ${this.getTokenFromLocalStorage()}`}
-            })
-            .then(response => {
-                this.$store.commit('SET_USER_ID_FROM_VUEX', response.data.user_id_session)
-                this.dataLoaded = true;
-            })
-            .catch(error => { 
-                if(error.response.status === 401){
-                    window.location.href = 'http://localhost:8080';
-                }
-                console.log(error.response)
-            })
-        },
-
         getIdPublicationFromUrl(){
             const url = new URLSearchParams(window.location.search);
             return parseInt(url.get("id")); 
-        },
-
-        getTokenFromLocalStorage(){
-            return JSON.parse(localStorage.getItem('groupomania_token'))
-        },
-
-        setUserTokenInVueX(){
-            this.$store.commit('SET_TOKEN_USER_FROM_VUEX', this.getTokenFromLocalStorage())
         },
     }
     
