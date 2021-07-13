@@ -1,22 +1,33 @@
 <template>
     <div>
-        <h1>404 not found</h1>
-        <h2>It seems you're in the wrong page</h2>
-        <div v-if="getUserIdFromVueX !== 0">
-            <router-link to="/news">Go to Home Page</router-link>
-        </div>
+        <HeaderNav/>
+        <div class="not-found-page">
 
-        <div v-else>
-            <router-link to="/">Go to Home Page</router-link>
+            <h1>Erreur 404</h1>
+            <h2>Cette page n'existe pas.</h2>
+            <div class="bloc-link-homepage" v-if="getUserIdFromVueX !== 0">
+                <router-link to="/news" class="bloc-link-homepage__link">Page d'accueil</router-link>
+            </div>
+
+            <div v-else class="bloc-link-homepage">
+                <router-link to="/" class="bloc-link-homepage__link">Page d'accueil</router-link>
+            </div>
         </div>
     </div>
+
 </template>
 
 <script>
 import { mapState } from 'vuex';
 
+import HeaderNav from '@/components/HeaderNav.vue';
+
 export default {
     name: 'NotFoundPage',
+
+    components:{
+        HeaderNav
+    },
 
     computed:{
         ...mapState({
@@ -37,6 +48,41 @@ export default {
 }
 </script>
 
-<style>
+<style scoped lang="scss">
+    .not-found-page{
+        width: 100%;
+        height: 500px;
+        display: flex;
+        flex-direction: column;
+        color: #FFF;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 20px;
+
+        h1{
+            font-size: 50px;
+        }
+
+        h2{
+            font-size: 25px;
+        }
+
+        .bloc-link-homepage{
+            margin-top: 20px;
+
+            &__link{
+                font-size: 20px;
+                color: rgb(255, 255, 255);
+                font-weight: bold;
+            }
+
+            &__link:hover{
+                color: rgb(2, 49, 179);
+            }
+        }
+
+
+    }
 
 </style>

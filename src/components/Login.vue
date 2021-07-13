@@ -76,8 +76,8 @@ export default {
                 })
                 .catch(err => {
                     console.log(err.response);
-
-                    this.errorMsgLogin = err.response.data.notValid;
+                    this.errorMsgLogin = err.response.data;
+                    //this.errorMsgLogin = err.response.data.notValid;
                     this.inputPassword = ''
                 })
 
