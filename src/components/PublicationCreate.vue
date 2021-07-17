@@ -14,7 +14,7 @@
                     <input @change="previewImage" id="inputUploadImg" class="form-group__file-upload" type="file" name="file" ref="fileInput">  
                 </div>
                 <div class="row-btn">
-                    <button class="button">Publier</button>
+                    <button v-bind:class="{'button--disabled' : !btnDisabled}" v-bind:disabled="!btnDisabled" class="button">Publier</button>
                 </div>
             </form>
         </div>
@@ -24,45 +24,54 @@
 <script>
 import { mapState } from 'vuex';
 
-
 export default {
     name: 'PublicationCreate',
-
     data(){
         return {
             message: '',
             file: '',
-
             imageTempUrl: null,
             selectedFile: null,
         }
     },
-
     computed: {
         ...mapState({
             getUserIdFromVueX: 'userIdFromVueX',
             getUserTokenFromVueX: 'tokenUserFromVueX',
         }),
-    },
 
-    methods:{
-
-
-        createNewPublication(){
-            
-            let formData = new FormData()
-            formData.append('userId', this.getUserIdFromVueX);
-            formData.append('message', this.message);
-            formData.append('image', this.selectedFile);
-
-            this.$store.dispatch('createNewPublication', { formData: formData, token: this.getUserTokenFromVueX })
-            this.message = ''
-            this.file = ''
-            this.imageTempUrl = null
-            this.selectedFile = null
+        btnDisabled(){
+            if (this.message || this.selectedFile) {
+                return true;
+            } else {
+                return false;
+            }
         },
+    },
+    methods:{
+        createNewPublication(){
+            try {
+                if(this.message || this.selectedFile){
+
+                    let formData = new FormData()
+                    formData.append('userId', this.getUserIdFromVueX);
+                    formData.append('message', this.message);
+                    formData.append('image', this.selectedFile);
+
+                    this.$store.dispatch('createNewPublication', { formData: formData, token: this.getUserTokenFromVueX });
+                    
+                    this.message = '';
+                    this.file = null;
+                    this.imageTempUrl = null;
+                    this.selectedFile = null;
+                }
+
+            } catch(err) {
+                console.log(err)
+            }
 
 
+        },
         previewImage(event) {
             this.selectedFile = event.target.files[0]
             // Reference to the DOM input element
@@ -76,29 +85,26 @@ export default {
                     // Note: arrow function used here, so that "this.imageTempUrl" refers to the imageTempUrl of Vue component
                     // Read image as base64 and set to imageTempUrl
                     this.imageTempUrl = e.target.result;
-                }
+                };
                 // Start the reader job - read file as a data url (base64 format)
                 reader.readAsDataURL(input.files[0]);
             }
         },
-
         cancelPrevImage(){
-            document.getElementById('inputUploadImg').value = ""
-            this.imageTempUrl = null          
+            document.getElementById('inputUploadImg').value = "";
+            this.imageTempUrl = null;        
         },
     }   
 }
 </script>
 
 <style scoped lang="scss">
-
 .form-publication-container{
     width: 100%;
     height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-
     .card {
         display: flex;
         flex-direction: column;
@@ -108,29 +114,24 @@ export default {
         border-radius: 16px;
         padding:25px;
         margin: 50px 20px;
-
         &__title {
             text-align: left;
             font-weight: 800;
             margin-bottom: 20px;
         }
-
         .form-publication{
-
             .div-image-preview{
                 margin-top: 20px; 
                 margin-bottom: 20px; 
                 width: 25%;
                 position: relative;
                 display: flex;
-
                 &__image-preview{
                     width: 100%;
                     border-radius: 15px;
                     z-index: 1;
                 }            
             }
-
             .div-image-preview::before{
                 display: flex;
                 align-items: center;
@@ -149,11 +150,9 @@ export default {
                 top: 5px;
                 cursor: pointer;
             }
-
             .form-group{
                 display: flex;
                 margin: 20px 0 20px 0;
-
                 &__file-upload{
                     display: none;
                 }       
@@ -163,11 +162,9 @@ export default {
                     filter: invert(18%) sepia(3%) saturate(36%) hue-rotate(328deg) brightness(91%) contrast(81%);
                     cursor:pointer;     
                 }
-
                 &__icon:hover{
                     filter: invert(35%) sepia(100%) saturate(841%) hue-rotate(182deg) brightness(93%) contrast(99%);
                 }
-
                 &__message-input{
                     padding: 18px;
                     border: none;
@@ -181,17 +178,10 @@ export default {
                     font-family: Avenir, Helvetica, Arial, sans-serif;
                 }            
             }
-
             .row-btn{
                 margin-top: 20px;
             }
         }
     }
-
 }
-
-
-
-
-
 </style>

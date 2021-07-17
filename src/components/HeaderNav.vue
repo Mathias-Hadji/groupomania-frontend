@@ -1,13 +1,13 @@
 <template>
     <nav class="main-nav">
-        <div class="container-elt-logo" v-if="getUserIdFromVueX !== 0">
+        <div class="container-elt-logo" v-if="getUserIdFromVueX > 0">
             <router-link to="/news"><img class="logo-groupomania" alt="logo du site" src="@/assets/logo.svg"></router-link>
         </div>
         <div class="container-elt-logo" v-else>
             <img class="logo-groupomania" alt="logo du site" src="@/assets/logo.svg">
         </div>
 
-        <div class="container-elt-link" v-if="getUserIdFromVueX !== 0">
+        <div class="container-elt-link" v-if="getUserIdFromVueX > 0">
             <div class="nav-link">
                 <router-link to="/news"><img src="../assets/home-solid.svg"  class="nav-link__item" alt="Accueil"></router-link>
             </div>
@@ -46,17 +46,11 @@ export default {
     },
 
     methods:{
-        onClickDisconected(){
-
-            sessionService.deleteUserSession(this.getUserIdFromVueX, this.getUserTokenFromVueX)
-            .then(() => {
-                window.localStorage.removeItem('groupomania_token');
-                window.localStorage.removeItem('groupomania_publicationsLiked');
-                window.location.href = 'http://localhost:8080';
-            })
-            .catch(err => {
-                console.log(err)
-            });
+        async onClickDisconected(){
+            await sessionService.deleteUserSession(this.getUserIdFromVueX, this.getUserTokenFromVueX)
+            window.localStorage.removeItem('groupomania_token');
+            window.localStorage.removeItem('groupomania_publicationsLiked');
+            window.location.href = 'http://localhost:8080';
         },
     }
 }

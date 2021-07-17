@@ -24,6 +24,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 
 import userService from '../services/userService';
 import sessionService from '../services/sessionService';
@@ -36,15 +37,18 @@ export default {
             inputEmail: '',
             inputPassword: '',
 
-            emailRegExp: new RegExp('^[a-z0-9._-]+[@]{1}[a-z]+[.]{1}[a-z]{2,3}$','i'),
-            passwordRegExp: new RegExp("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$", 'i'),
-
             successMsgLogin: null,
             errorMsgLogin: null,
         }
     },
 
     computed: {
+
+        ...mapState({
+            getEmailRegExpFromVueX: 'emailRegExp',
+            getPasswordRegExpFromVueX: 'passwordRegExp',
+
+        }),
 
         btnDisabled(){
             if (this.inputEmail.length > 0 && this.inputPassword.length > 0) {
@@ -53,6 +57,7 @@ export default {
                 return false;
             }
         },
+
     },
 
     methods: {
@@ -61,46 +66,46 @@ export default {
             this.$store.dispatch('setMode', 'createAccount')
         },
 
-        login(){
-            if(this.emailRegExp.test(this.inputEmail) && this.passwordRegExp.test(this.inputPassword)){
 
-                userService.login(this.inputEmail.trim(), this.inputPassword)
-                .then(res => {
-                    this.errorMsgLogin = null;
-                    this.successMsgLogin = res.data.message;
+        async login(){
+            try {
+                if(!this.getEmailRegExpFromVueX.test(this.inputEmail)){
+                    let e = new Error('Email non valide.');
+                    e.name = 'RegexpErrorEmail';
+                    throw e;
+                }
 
-                    this.setTokenFromLocalStorage(res.data.token);
-                    this.setUserSession(res.data.userId, res.data.token)
+                if(!this.getPasswordRegExpFromVueX.test(this.inputPassword)){
+                    let e = new Error('Mot de passe non valide.');
+                    e.name = 'RegexpErrorPassword';
+                    throw e;
+                }
 
-                    window.location.href = 'http://localhost:8080/news';
-                })
-                .catch(err => {
-                    console.log(err.response);
-                    this.errorMsgLogin = err.response.data;
-                    //this.errorMsgLogin = err.response.data.notValid;
+                const response = await userService.login(this.inputEmail.trim(), this.inputPassword)
+                localStorage.setItem('groupomania_token', JSON.stringify(response.data.token));
+                await sessionService.setUserSession(response.data.userId, response.data.token);
+            
+                this.errorMsgLogin = '';
+                this.successMsgLogin = response.data.message;
+
+                window.location.href = 'http://localhost:8080/news';
+
+            } catch(err){
+                if(err.name === 'RegexpErrorEmail' || err.name === 'RegexpErrorPassword'){
+                    this.errorMsgLogin = err.message;
                     this.inputPassword = ''
-                })
-
-            } else {
-                this.errorMsgLogin = 'Email ou mot de passe incorrect.';
-                this.inputPassword = ''
+                    setTimeout(() => {
+                        this.errorMsgLogin = '';
+                    }, 3000);
+                } else {
+                    this.errorMsgLogin = err.response.data;
+                    this.inputPassword = ''
+                    setTimeout(() => {
+                        this.errorMsgLogin = null;
+                    }, 3000);
+                }
             }
         },
-
-        setUserSession(userId, token){
-            sessionService.setUserSession(userId, token)
-            .then(res => {
-                console.log(res)
-            })
-            .catch(err => {
-                console.log(err.response);
-            })
-        },
-
-        setTokenFromLocalStorage(token){
-            localStorage.setItem('groupomania_token', JSON.stringify(token))
-        },
-
     },
 }
 </script>

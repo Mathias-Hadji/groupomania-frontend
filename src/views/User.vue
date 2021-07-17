@@ -36,16 +36,10 @@ export default {
         }),
     },
 
-    created(){
-        this.$store.dispatch('getUserId', this.getUserTokenFromVueX)
+    async created(){
+        await this.$store.dispatch('getUserId', this.getUserTokenFromVueX)
+        await this.$store.dispatch('getOneUser', { userId: this.getUserIdFromVueX, token: this.getUserTokenFromVueX })
     },
-    
-    watch: {
-        getUserIdFromVueX: function(){
-            this.$store.dispatch('getOneUser', { userId: this.getUserIdFromVueX, token: this.getUserTokenFromVueX })
-        }
-    },
-
 }
 </script>
 

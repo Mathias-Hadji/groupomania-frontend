@@ -69,8 +69,8 @@
                     <div class="add-new-comment">
                         <textarea v-model="addNewComment" class="add-new-comment__input" placeholder="Ecrivez un commentaire..."></textarea>
                         <span>
-                            <button @click="publishNewComment(publicationId)" class="button">Publier</button>
-                        </span>
+                            <button v-bind:class="{'button--disabled' : !btnDisabled}" v-bind:disabled="!btnDisabled" @click="publishNewComment(publicationId)" class="button">Publier</button>
+                        </span> 
                     </div>
                 </div>
 
@@ -124,8 +124,8 @@ export default {
             arrayPublicationLikedByUser: [],
 
             comments: [],
-            profilePicUser: '',
-            addNewComment: '',
+            profilePicUser: null,
+            addNewComment: null,
 
             showUrlPublication: false,
             shareLinkIsClicked: false,
@@ -151,6 +151,14 @@ export default {
             getIsAdminUserFromVueX: 'isAdminUserFromVueX',
         }),
 
+        btnDisabled(){
+            if (this.addNewComment) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+
         urlPublication(){
             return 'http://localhost:8080/post/?id=' + this.publicationData.id
         },
@@ -165,13 +173,14 @@ export default {
 
     methods:{
 
-        getOnePublication(){
-            publicationService.getOnePublication(this.publicationId ,this.getUserTokenFromVueX)
-            .then(res => {
-                this.publicationData = res.data;
-                this.authorPublicationData = res.data.User;
-            })
-            .catch(err => console.log(err.response));
+        async getOnePublication(){
+            try {
+                const response = await publicationService.getOnePublication(this.publicationId ,this.getUserTokenFromVueX)
+                this.publicationData = response.data;
+                this.authorPublicationData = response.data.User;
+            } catch(err) {
+                console.log(err.response.statusText)
+            }
         },
 
         deletePublication(){
@@ -183,65 +192,72 @@ export default {
             }
         },
 
-        getLikesOfOnePublication(){
-            publicationService.getLikesOfOnePublication(this.publicationId, this.getUserTokenFromVueX)
-            .then(res => {
-                this.likesPublication = res.data;
-            })
-            .catch(err => console.log(err.response));
-        },
-
-        getPublicationsLikedByOneUser(){
-            userService.getAllLikesOfOneUser(this.getUserIdFromVueX, this.getUserTokenFromVueX)
-            .then(res => {
-                this.arrayPublicationLikedByUser = []
-
-                for(let i = 0; i < res.data.length; i++){
-                    this.arrayPublicationLikedByUser.push(res.data[i].publication_id)
-                }
-                localStorage.setItem('groupomania_publicationsLiked', JSON.stringify(this.arrayPublicationLikedByUser))
-            })
-            .catch(err => console.log(err.response));
-        },
-
-        onLikePublication(){
-            publicationService.addOneLikeToggle(this.publicationId, this.getUserIdFromVueX, this.getUserTokenFromVueX)
-            .then(() => {
-                this.getLikesOfOnePublication();
-                this.getPublicationsLikedByOneUser();
-            })
-            .catch(err => console.log(err.response));
-        },
-
-        getCommentsOfOnePublication(){
-            commentService.getCommentsOfOnePublication(this.publicationId, this.getUserTokenFromVueX)
-            .then(res => {
-                this.comments = res.data;
-            })
-            .catch(err => console.log(err.response));
-        },
-
-        publishNewComment(){
-            commentService.createNewComment(this.publicationId, this.getUserIdFromVueX, this.addNewComment, this.getUserTokenFromVueX)
-            .then(() => {
-                this.getCommentsOfOnePublication()
-                this.addNewComment = ''
-            })
-            .catch(err => console.log(err.response));
-        },
-
-        deleteOneComment(commentId){
-            const confirmMsgDeletePublication = confirm('Etes-vous sûr de vouloir supprimer votre commentaire ? Attention, cette action est irreversible.')
-
-            if(confirmMsgDeletePublication){
-                commentService.deleteOneComment(commentId, this.getUserIdFromVueX, this.getUserTokenFromVueX)
-                .then(() => {
-                    this.getCommentsOfOnePublication()
-                })
-                .catch(err => console.log(err.response));
-            } else {
-                alert('Suppression annulée.');
+        async getLikesOfOnePublication(){
+            try {
+                const response = await publicationService.getLikesOfOnePublication(this.publicationId, this.getUserTokenFromVueX);
+                this.likesPublication = response.data;
+            } catch(err) {
+                console.log(err.response.data)
             }
+        },
+
+        async getPublicationsLikedByOneUser(){
+            try {
+                const response = await userService.getAllLikesOfOneUser(this.getUserIdFromVueX, this.getUserTokenFromVueX);
+                this.arrayPublicationLikedByUser = [];
+
+                for(let i = 0; i < response.data.length; i++){
+                    this.arrayPublicationLikedByUser.push(response.data[i].publication_id);
+                }
+                localStorage.setItem('groupomania_publicationsLiked', JSON.stringify(this.arrayPublicationLikedByUser));
+            } catch(err) {
+                console.log(err.response.data)
+            }
+        },
+
+        async onLikePublication(){
+            try {
+                await publicationService.addOneLikeToggle(this.publicationId, this.getUserIdFromVueX, this.getUserTokenFromVueX);
+                await this.getLikesOfOnePublication();
+                await this.getPublicationsLikedByOneUser();
+            } catch(err){
+                console.log(err.response.data)
+            }
+        },
+
+        async getCommentsOfOnePublication(){
+            try {
+                const response = await commentService.getCommentsOfOnePublication(this.publicationId, this.getUserTokenFromVueX)
+                this.comments = response.data;
+            } catch(err) {
+                console.log(err.response.data)
+            }
+        },
+
+        async publishNewComment(){
+            try {
+                await commentService.createNewComment(this.publicationId, this.getUserIdFromVueX, this.addNewComment, this.getUserTokenFromVueX)
+                await this.getCommentsOfOnePublication()
+                this.addNewComment = ''
+            } catch(err) {
+                console.log(err.response.data)
+            }
+        },
+
+        async deleteOneComment(commentId){
+            try {
+                const confirmMsgDeletePublication = confirm('Etes-vous sûr de vouloir supprimer votre commentaire ? Attention, cette action est irreversible.')
+
+                if(confirmMsgDeletePublication){
+                    await commentService.deleteOneComment(commentId, this.getUserIdFromVueX, this.getUserTokenFromVueX)
+                    await this.getCommentsOfOnePublication()
+                } else {
+                    alert('Suppression annulée.');
+                }
+            } catch(err) {
+                console.log(err.response.data)
+            }
+
         },
 
         onSharePublication(){

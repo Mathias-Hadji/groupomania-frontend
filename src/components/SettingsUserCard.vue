@@ -35,7 +35,9 @@
                         <p class="user-bio__content-bio">{{ getBioUserFromVueX }}</p>
                         <textarea v-model="inputBioUser" class="user-bio__message-input" rows="5" maxlength="255" placeholder="Ajouter un texte ..."></textarea>
                         <button @click="modifyBioUser" class="button">Modifier ma bio</button>
+                        <span>Nombre de carctères restants: [{{ 255 - inputBioUser.length}}]</span>
                         <p v-if="successMsgInputBioUser != null" class="user-bio__success-message text-success">{{ successMsgInputBioUser }}</p> 
+                        <p v-if="errorMsgInputBioUser != null" class="user-bio__success-message text-success">{{ errorMsgInputBioUser }}</p> 
                     </div>
                 </section>
             </section>
@@ -74,27 +76,22 @@ import sessionService from '../services/sessionService';
 
 export default {
     data(){
-        return{
-
+        return {
             inputBioUser: '',
             successMsgInputBioUser: null,
+            errorMsgInputBioUser: null,
 
             inputUserCurrentPassword: '',
             inputUserNewPassword: '',
+            successMsgPassword: null,
+            errorMsgCurrentPassword: null,
+            errorMsgNewPassword:null,
 
             profilePicUser: '',
             selectedFile: null,
             imageTempUrl: null,
             validBtnProfilePic: false,
             cancelBtnProfilePic: false,
-
-            passwordRegExp: new RegExp("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$", 'i'),
-            
-            successMsgPassword: null,
-            errorMsgCurrentPassword: null,
-            errorMsgNewPassword:null,
-
-
             successMsgProfilePic: null,
         }
     },
@@ -103,13 +100,10 @@ export default {
         ...mapState({
             getUserIdFromVueX: 'userIdFromVueX',
             getUserTokenFromVueX: 'tokenUserFromVueX',
-        
             getFirstNameUserFromVueX: 'firstNameUserFromVueX',
             getLastNameUserFromVueX: 'lastNameUserFromVueX',
             getEmailUserFromVueX: 'emailUserFromVueX',
-
             getBioUserFromVueX: 'bioUserFromVueX',
-
             getProfilePicUserFromVueX: 'profilePicUserFromVueX',
         }),
         
@@ -124,84 +118,93 @@ export default {
 
 
     methods:{
-        modifyBioUser(){
-            userService.modifyBioUser(this.getUserIdFromVueX, this.getUserTokenFromVueX, this.inputBioUser)
-            .then(res => {
+
+        async modifyBioUser(){
+            try {
+                const response = await userService.modifyBioUser(this.getUserIdFromVueX, this.getUserTokenFromVueX, this.inputBioUser.trim())
+
+                this.$store.commit('SET_BIO_USER_FROM_VUEX', response.data.bio)
                 this.inputBioUser = ''
+                this.successMsgInputBioUser = response.data.successMessage;
 
-                this.$store.commit('SET_BIO_USER_FROM_VUEX', res.data.bio)
-                this.successMsgInputBioUser = res.data.successMessage
-            })
-            .catch(err => {
-                console.log(err)
-            });
-        },
+                setTimeout(() => {
+                    this.successMsgInputBioUser = '';
+                }, 2000);
 
-        modifyProfilePic(){
-            let formData = new FormData();
-            formData.append('userId', this.getUserIdFromVueX);
-            formData.append('image', this.selectedFile);
-
-            userService.modifyProfilePicUser(this.getUserIdFromVueX, formData, this.getUserTokenFromVueX)
-            .then(res => {
-                this.$store.commit('SET_PROFILE_PIC_USER_FROM_VUEX', res.data.profilePic)
-                this.successMsgProfilePic =  res.data.successMessage;
-            })
-            .catch(err => {
-                console.log(err)
-            });
+            } catch(err) {
+                console.log(err.response.data)
+            }
         },
 
 
-        modifyPassword(){
-            userService.modifyPasswordUser(this.getUserIdFromVueX, this.getUserTokenFromVueX, this.inputUserCurrentPassword, this.inputUserNewPassword)
-            .then(res => {
+        async modifyProfilePic(){
+            try {
+                let formData = new FormData();
+                formData.append('userId', this.getUserIdFromVueX);
+                formData.append('image', this.selectedFile);
+
+                const response = await userService.modifyProfilePicUser(this.getUserIdFromVueX, formData, this.getUserTokenFromVueX);
+                this.$store.commit('SET_PROFILE_PIC_USER_FROM_VUEX', response.data.profilePic);
+                this.successMsgProfilePic =  response.data.successMessage;
+
+                setTimeout(() => {
+                    this.successMsgProfilePic = '';
+                }, 2000);
+
+                this.validBtnProfilePic = false;
+                this.cancelBtnProfilePic = false;
+
+            } catch(err){
+                console.log(err.response.data)
+            }
+        },
+
+        async modifyPassword(){
+            try {
+                const response = await userService.modifyPasswordUser(this.getUserIdFromVueX, this.getUserTokenFromVueX, this.inputUserCurrentPassword, this.inputUserNewPassword);
+                
                 this.errorMsgCurrentPassword = ''
                 this.inputUserCurrentPassword = ''
                 this.inputUserNewPassword = ''
 
-                this.successMsgPassword =  res.data.successMessage;
-            })
-            .catch(err => {
+                this.successMsgPassword =  response.data.successMessage;
+
+                setTimeout(() => {
+                    this.successMsgPassword = '';
+                }, 2000);
+
+            } catch(err) {
                 this.successMsgPassword =  '';
 
-                this.errorMsgCurrentPassword = err.response.data.errorMessage;
-                this.errorMsgNewPassword = err.response.data.errorMessage;
-            });
-        },
+                this.errorMsgCurrentPassword = err.response.data;
+                this.errorMsgNewPassword = err.response.data;
 
-        deleteAccount(){
-            const confirmMsgDeleteAccount = confirm('Attention, cette action est irreversible. Etes-vous sûr de vouloir supprimer votre compte ?')
-
-            if(confirmMsgDeleteAccount){
-
-                userService.deleteOneUserAccount(this.getUserIdFromVueX, this.getUserTokenFromVueX)
-                .then(() => {
-                    this.deleteUserSession();
-
-                    window.localStorage.removeItem('groupomania_token');
-                    window.localStorage.removeItem('groupomania_publicationsLiked');
-                    window.location.href = '/';
-                })
-                .catch(err => {
-                    console.log(err.response.data.errorMessage)
-                });
-
-            } else {
-                alert('Suppression de votre compte annulée.')
+                setTimeout(() => {
+                    this.errorMsgCurrentPassword = '';
+                    this.errorMsgNewPassword = '';
+                }, 2000);
             }
         },
 
-        deleteUserSession(){
-            sessionService.deleteUserSession(this.getUserIdFromVueX, this.getUserTokenFromVueX)
-            .then(res => {
-                console.log(res.data.successMessage)
-            })
-            .catch(err => {
-                console.log(err.response.data.errorMessage)
-            });
-        },
+        async deleteAccount(){
+            try {
+                const confirmMsgDeleteAccount = confirm('Attention, cette action est irreversible. Etes-vous sûr de vouloir supprimer votre compte ?');
 
+                if(confirmMsgDeleteAccount){
+                    window.localStorage.removeItem('groupomania_token');
+                    window.localStorage.removeItem('groupomania_publicationsLiked');
+                    window.location.href = '/';
+                    await userService.deleteOneUserAccount(this.getUserIdFromVueX, this.getUserTokenFromVueX);
+                    await sessionService.deleteUserSession(this.getUserIdFromVueX, this.getUserTokenFromVueX);
+
+                } else {
+                    alert('Suppression de votre compte annulée.')
+                }
+
+            } catch(err) {
+                console.log(err.response.data)
+            }
+        },
 
         previewImage(event) {
             this.validBtnProfilePic = true;
@@ -224,13 +227,7 @@ export default {
             }
         },
 
-
-
         cancelModifyProfilePic(){
-            this.reloadPage()
-        },
-
-        reloadPage(){
             window.location.reload()
         },
     }

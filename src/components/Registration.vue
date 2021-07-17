@@ -32,6 +32,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import userService from '../services/userService';
 
 export default {
@@ -44,11 +45,6 @@ export default {
             inputEmail: '',
             inputPassword: '',
 
-            firstNameRegExp: new RegExp('^[a-zéèêëàâîïôöûü-]+$', 'i'),
-            lastNameRegExp: new RegExp('^[a-zéèêëàâîïôöûü-]+$','i'),
-            emailRegExp: new RegExp('^[a-z0-9._-]+[@]{1}[a-z]+[.]{1}[a-z]{2,3}$','i'),
-            passwordRegExp: new RegExp("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$", 'i'),
-
             successMsgRegistration: null,
 
             errorMsgFirstName: null,
@@ -56,10 +52,17 @@ export default {
             errorMsgEmail: null,
             errorMsgPassword: null,
             errorMsgEmailAlreadyUsed: null,
+
         }
     },
 
     computed: {
+        ...mapState({
+            getFirstNameRegExpFromVueX: 'firstNameRegExp',
+            getLastNameRegExpFromVueX: 'lastNameRegExp',
+            getEmailRegExpFromVueX: 'emailRegExp',
+            getPasswordRegExpFromVueX: 'passwordRegExp',
+        }),
 
         btnDisabled(){
 
@@ -73,85 +76,81 @@ export default {
 
     methods: {
 
-        uppercaseFirstLetter(string){
-            return string.charAt(0).toUpperCase() + string.slice(1);
-        },
-
         switchMode(){
             this.$store.dispatch('setMode', 'login')
         },
 
         validFirstName(){
-
-            if(!this.firstNameRegExp.test(this.inputFirstName)){
+            if(!this.getFirstNameRegExpFromVueX.test(this.inputFirstName)){
                 this.errorMsgFirstName = '- Prénom non valide.';
             } else {
                 this.errorMsgFirstName = null;   
+                return true;
             }
         },
 
         validLastName(){
-
-            if(!this.lastNameRegExp.test(this.inputLastName)){
+            if(!this.getLastNameRegExpFromVueX.test(this.inputLastName)){
                 this.errorMsgLastName = '- Nom non valide.';
             } else {
                 this.errorMsgLastName = null;   
+                return true;
             }
         },
 
         validEmail(){
-
-            if(!this.emailRegExp.test(this.inputEmail)){
+            if(!this.getEmailRegExpFromVueX.test(this.inputEmail)){
                 this.errorMsgEmail = '- Email non valide.';
             } else {
-                this.errorMsgEmail = null;   
+                this.errorMsgEmail = null; 
+                return true;  
             }
         },
 
         validPassword(){
-            
-            if(!this.passwordRegExp.test(this.inputPassword)){
+            if(!this.getPasswordRegExpFromVueX.test(this.inputPassword)){
                 this.errorMsgPassword = '- Le mot de passe doit avoir une longueur minimale de 8 caractères, 1 lettre majuscule, 1 lettre minuscule, 1 chiffre, 1 caractère spécial.';
             } else {
                 this.errorMsgPassword = null;   
+                return true;
             }
         },
 
+        async createUserAccount(){
+            try {
+                if(this.validFirstName() && this.validLastName() && this.validEmail() && this.validPassword()){
+                    const registration = await userService.registration (
+                        this.uppercaseFirstLetter(this.inputFirstName.trim().toLowerCase()),
+                        this.inputLastName.trim().toUpperCase(),
+                        this.inputEmail.toLowerCase().trim(),
+                        this.inputPassword
+                    );
 
-        createUserAccount(){
-            if(this.firstNameRegExp.test(this.inputFirstName) && this.lastNameRegExp.test(this.inputLastName) && this.emailRegExp.test(this.inputEmail) && this.passwordRegExp.test(this.inputPassword)){
-                userService.registration(
-                    this.uppercaseFirstLetter(this.inputFirstName.trim().toLowerCase()),
-                    this.inputLastName.trim().toUpperCase(),
-                    this.inputEmail.toLowerCase().trim(),
-                    this.inputPassword
-                )
-                .then(response => {
-                    this.successMsgRegistration = response.data.message;
-
+                    this.successMsgRegistration = registration.data.message;
                     this.errorMsgFirstName = null;
                     this.errorMsgLastName = null;
                     this.errorMsgEmail = null;
                     this.errorMsgPassword = null;
-                    
-                    this.inputFirstName = ''
-                    this.inputLastName = ''
-                    this.inputEmail = ''
-                    this.inputPassword = ''
-                })
-                .catch(error => {
-                    if(error.response.data.notValid){
-                        this.errorMsgFirstName = error.response.data.notValid;
-                        this.errorMsgLastName = error.response.data.notValid;
-                        this.errorMsgEmail = error.response.data.notValid;
-                        this.errorMsgPassword = error.response.data.notValid;
-                        this.inputPassword = ''
-                    } else {
-                        this.errorMsgEmailAlreadyUsed = error.response.data.alreadyUsed
-                        this.inputPassword = ''
-                    }
-                })
+                    this.errorMsgEmailAlreadyUsed = null;
+                    this.inputFirstName = '';
+                    this.inputLastName = '';
+                    this.inputEmail = '';
+                    this.inputPassword = '';
+                    setTimeout(() => {
+                        this.$store.dispatch('setMode', 'login');
+                    }, 1000);
+
+                }
+            } catch(err){
+                this.errorMsgEmailAlreadyUsed = err.response.data;
+                setTimeout(() =>{
+                    this.errorMsgEmailAlreadyUsed = null;
+                }, 3000);
             }
+        },
+
+        uppercaseFirstLetter(string){
+            return string.charAt(0).toUpperCase() + string.slice(1);
         },
     },
 }

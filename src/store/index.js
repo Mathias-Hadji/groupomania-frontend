@@ -22,8 +22,14 @@ export default createStore({
         profilePicUserFromVueX: '',
         bioUserFromVueX: '',
 
+        firstNameRegExp: new RegExp('^[a-zéèêëàâîïôöûü-]+$', 'i'),
+        lastNameRegExp: new RegExp('^[a-zéèêëàâîïôöûü-]+$','i'),
+        emailRegExp: new RegExp('^[a-z0-9._-]+[@]{1}[a-z]+[.]{1}[a-z]{2,3}$','i'),
+        passwordRegExp: new RegExp("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$", 'i'),
+
         // User Publication
-        listOfPublicationsFromVueX: [],
+        listOfPublicationsFromVueX: null,
+
     },
     getters: {
 
@@ -72,80 +78,70 @@ export default createStore({
 
     actions: {
 
-        // LOGIN & REGISTRATION
-
+        // SHOW LOGIN OR REGISTRATION COMPONENT
         setMode(context, payload){
             context.commit('SET_MODE_FROM_VUEX', payload);
         },
 
         // USER
+        async getOneUser(context, payload){
+            try {
+                const response = await userService.getOneUser(payload.userId, payload.token);
+                context.commit('SET_FIRST_NAME_USER_FROM_VUEX', response.data.first_name_user);
+                context.commit('SET_LAST_NAME_USER_FROM_VUEX', response.data.last_name_user);
+                context.commit('SET_EMAIL_USER_FROM_VUEX', response.data.email_user);
+                context.commit('SET_PROFILE_PIC_USER_FROM_VUEX', response.data.profile_pic_user);
+                context.commit('SET_BIO_USER_FROM_VUEX', response.data.bio_user);
+                context.commit('SET_IS_ADMIN_USER_FROM_VUEX', response.data.is_admin);
 
-        getOneUser(context, payload){
-            userService.getOneUser(payload.userId, payload.token)
-            .then(res => {
-                context.commit('SET_FIRST_NAME_USER_FROM_VUEX', res.data.first_name_user)
-                context.commit('SET_LAST_NAME_USER_FROM_VUEX', res.data.last_name_user)
-                context.commit('SET_EMAIL_USER_FROM_VUEX', res.data.email_user)
-                context.commit('SET_PROFILE_PIC_USER_FROM_VUEX', res.data.profile_pic_user)
-                context.commit('SET_BIO_USER_FROM_VUEX', res.data.bio_user)
-                context.commit('SET_IS_ADMIN_USER_FROM_VUEX', res.data.is_admin)
-            })
-            .catch(err => console.log(err.message));
+            } catch(err) {
+                console.log(err.message);
+            }
         },
 
-        // SESSION
 
-        getUserId(context, token){
-            sessionService.getOneUserSession(token)
-            .then(res => {
-                context.commit('SET_USER_ID_FROM_VUEX', res.data.user_id_session)
-            })
-            .catch(err => {
-                if(err.response.status === 404 || err.response.status === 401){
-                    window.location.href = 'http://localhost:8080';
-                }
-            });
+        // SESSION
+        async getUserId(context, token){
+            try {
+                const response = await sessionService.getOneUserSession(token)
+                context.commit('SET_USER_ID_FROM_VUEX', response.data.user_id_session)
+            } catch(err){
+                window.location.href = 'http://localhost:8080';
+            }   
         },
 
 
         // PUBLICATION
+        async getAllPublications(context, payload){
+            try {
+                const response = await publicationService.getAllPublications(payload.token);
+                context.commit('SET_LIST_OF_PUBLICATIONS_FROM_VUEX', response.data);
 
-        getAllPublications(context, payload){
-            publicationService.getAllPublications(payload.token)
-            .then(res => {
-                context.commit('SET_LIST_OF_PUBLICATIONS_FROM_VUEX', res.data)
-            })
-            .catch(err => console.log(err.message));
+            } catch(err){
+                console.log(err.message);
+            }
         },
 
-        createNewPublication(context, payload){
-            publicationService.createNewPublication(payload.formData, payload.token)
-            .then(() => {
+        async createNewPublication(context, payload){
+            try {
+                await publicationService.createNewPublication(payload.formData, payload.token);
+                const response = await publicationService.getAllPublications(payload.token);
+                context.commit('SET_LIST_OF_PUBLICATIONS_FROM_VUEX', response.data);
 
-                publicationService.getAllPublications(payload.token)
-                .then(res => {
-                    context.commit('SET_LIST_OF_PUBLICATIONS_FROM_VUEX', res.data)
-                })
-                .catch(err => console.log(err.message));
-            })
-            .catch(err => {
-                console.log(err)
-            });
+            } catch(err) {
+                console.log(err.message);
+            }
         },
 
-        deleteOnePublication(context, payload){
-            publicationService.deleteOnePublication(payload.publicationId, payload.userId, payload.token)
-            .then(() => {
+        async deleteOnePublication(context, payload){
+            try {
+                await publicationService.deleteOnePublication(payload.publicationId, payload.userId, payload.token);
+                const response = await publicationService.getAllPublications(payload.token);
+                context.commit('SET_LIST_OF_PUBLICATIONS_FROM_VUEX', response.data);
 
-                publicationService.getAllPublications(payload.token)
-                .then(res => {
-                    context.commit('SET_LIST_OF_PUBLICATIONS_FROM_VUEX', res.data)
-                })
-                .catch(err => console.log(err.message));
-            })
-            .catch(err => {
-                console.log(err)
-            });
+            } catch(err){
+                console.log(err.message);
+            }
         },
     },
 

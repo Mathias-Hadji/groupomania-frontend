@@ -3,6 +3,8 @@ import axios from 'axios';
 let baseUrl = `http://localhost:3000/api`;
 
 export default {
+
+    
     getAllPublications(token){
         return axios.get(`${baseUrl}/publication`, { 
             headers: { Authorization: `Bearer ${token}`}

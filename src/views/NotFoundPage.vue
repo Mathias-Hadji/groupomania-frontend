@@ -36,15 +36,11 @@ export default {
         }),
     },
 
-    created(){
-        this.$store.dispatch('getUserId', this.getUserTokenFromVueX)
+    async created(){
+        await this.$store.dispatch('getUserId', this.getUserTokenFromVueX);
+        await this.$store.dispatch('getOneUser', { userId: this.getUserIdFromVueX, token: this.getUserTokenFromVueX });
     },
 
-    watch: {
-        getUserIdFromVueX: function(){
-            this.$store.dispatch('getOneUser', { userId: this.getUserIdFromVueX, token: this.getUserTokenFromVueX })
-        }
-    },
 }
 </script>
 
@@ -72,13 +68,13 @@ export default {
             margin-top: 20px;
 
             &__link{
-                font-size: 20px;
+                font-size: 18px;
                 color: rgb(255, 255, 255);
                 font-weight: bold;
             }
 
             &__link:hover{
-                color: rgb(2, 49, 179);
+                color: rgb(211, 211, 211);
             }
         }
 
