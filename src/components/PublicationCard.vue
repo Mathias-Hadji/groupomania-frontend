@@ -104,8 +104,8 @@
 
 <script>
 import publicationService from '../services/publicationService';
+import likeService from '../services/likeService';
 import commentService from '../services/commentService';
-import userService from '../services/userService';
 
 import { mapState } from 'vuex';
 
@@ -194,7 +194,7 @@ export default {
 
         async getLikesOfOnePublication(){
             try {
-                const response = await publicationService.getLikesOfOnePublication(this.publicationId, this.getUserTokenFromVueX);
+                const response = await likeService.getLikesOfOnePublication(this.publicationId, this.getUserTokenFromVueX);
                 this.likesPublication = response.data;
             } catch(err) {
                 console.log(err.response.data)
@@ -203,7 +203,7 @@ export default {
 
         async getPublicationsLikedByOneUser(){
             try {
-                const response = await userService.getAllLikesOfOneUser(this.getUserIdFromVueX, this.getUserTokenFromVueX);
+                const response = await likeService.getAllLikesOfOneUser(this.getUserIdFromVueX, this.getUserTokenFromVueX);
                 this.arrayPublicationLikedByUser = [];
 
                 for(let i = 0; i < response.data.length; i++){
@@ -217,7 +217,7 @@ export default {
 
         async onLikePublication(){
             try {
-                await publicationService.addOneLikeToggle(this.publicationId, this.getUserIdFromVueX, this.getUserTokenFromVueX);
+                await likeService.addOneLikeToggle(this.publicationId, this.getUserIdFromVueX, this.getUserTokenFromVueX);
                 await this.getLikesOfOnePublication();
                 await this.getPublicationsLikedByOneUser();
             } catch(err){

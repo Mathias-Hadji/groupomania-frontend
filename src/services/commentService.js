@@ -16,7 +16,6 @@ export default {
         );
     },
 
-    
     deleteOneComment(commentId, userId, token){
         return axios.delete(`${baseUrl}/comment/${commentId}`, { 
             data: { userId: userId },

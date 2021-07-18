@@ -22,12 +22,6 @@ export default {
         });
     },
 
-    getAllLikesOfOneUser(userId, token){
-        return axios.get(`${baseUrl}/user/likes/${userId}`, { 
-            headers: { Authorization: `Bearer ${token}`}
-        });
-    },
-
     modifyBioUser(userId, token, bioUser){
         return axios.put(`${baseUrl}/user/bio/${userId}`,  
             { userId: userId, bioUser: bioUser },

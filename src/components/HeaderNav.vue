@@ -71,6 +71,7 @@ export default {
         width: 300px;
         display: flex;
         margin-left: 20px;
+        padding: 10px;
 
         .logo-groupomania{
             display: flex;

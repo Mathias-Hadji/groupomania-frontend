@@ -250,6 +250,8 @@ export default {
         background: #FFF;
         border-radius: 16px;
         padding:32px;
+        margin-left: 20px;
+        margin-right: 20px;
         margin-top: 50px;
         margin-bottom: 50px;
 
@@ -284,8 +286,8 @@ export default {
                     &__pic{
                         margin-bottom: 20px;
                         border-radius:50%;
-                        width:12vw;
-                        height:12vw;
+                        width:150px;
+                        height:150px;
                         box-shadow: 3px 3px 5px 0px rgba(0,0,0,0.75);
                         -webkit-box-shadow: 3px 3px 5px 0px rgba(0,0,0,0.75);
                         -moz-box-shadow: 3px 3px 5px 0px rgba(0,0,0,0.75);
