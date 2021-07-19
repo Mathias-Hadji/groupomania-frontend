@@ -88,12 +88,12 @@ export default {
     background: rgb(212, 0, 0);
 }
 .button--disabled {
-    background:#cecece;
-    color:#ececec;
+    background:#77b2df;
+    color:#dddddd;
 }
 .button--disabled:hover {
     cursor:not-allowed;
-    background:#cecece;
+    background:#77b2df;
 }
 .input{
     padding: 8px;

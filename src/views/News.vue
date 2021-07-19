@@ -3,8 +3,8 @@
         <nav class="main-navbar">
             <HeaderNav/>
         </nav>
+        
         <PublicationCreate/>
-
 
         <div v-if="getListOfPublicationsFromVueX === null">
             <Loading/>
@@ -17,8 +17,6 @@
                 v-bind:publicationId="publication.id"
             />
         </div>
-
-
     </main>
 </template>
 
