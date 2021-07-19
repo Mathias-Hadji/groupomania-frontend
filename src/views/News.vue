@@ -5,11 +5,20 @@
         </nav>
         <PublicationCreate/>
 
-        <PublicationCard
-            v-for="publication in getListOfPublicationsFromVueX"
-            v-bind:key="publication.id"
-            v-bind:publicationId="publication.id"
-        />
+
+        <div v-if="getListOfPublicationsFromVueX === null">
+            <Loading/>
+        </div>
+
+        <div v-else >
+            <PublicationCard
+                v-for="publication in getListOfPublicationsFromVueX"
+                v-bind:key="publication.id"
+                v-bind:publicationId="publication.id"
+            />
+        </div>
+
+
     </main>
 </template>
 
@@ -21,6 +30,7 @@ import { mapState } from 'vuex';
 import HeaderNav from '@/components/HeaderNav.vue';
 import PublicationCreate from '@/components/PublicationCreate.vue';
 import PublicationCard from '@/components/PublicationCard.vue';
+import Loading from '@/components/Loading.vue';
 
 export default {
     name: 'News',
@@ -28,6 +38,7 @@ export default {
         HeaderNav,
         PublicationCreate,
         PublicationCard,
+        Loading,
     },
     data(){
         return {
@@ -45,7 +56,7 @@ export default {
     async created(){
         await this.$store.dispatch('getUserId', this.getUserTokenFromVueX);
         await this.$store.dispatch('getOneUser', { userId: this.getUserIdFromVueX, token: this.getUserTokenFromVueX });
-        await this.$store.dispatch('getAllPublications', { token: this.getUserTokenFromVueX });  
+        await this.$store.dispatch('getAllPublications', { token: this.getUserTokenFromVueX }); 
     },
 
     methods: {  
@@ -55,4 +66,5 @@ export default {
 </script>
 
 <style scoped lang="scss">
+
 </style>

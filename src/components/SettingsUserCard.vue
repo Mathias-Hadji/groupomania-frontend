@@ -75,6 +75,8 @@ import userService from '../services/userService';
 import sessionService from '../services/sessionService';
 
 export default {
+    name: 'SettingsUserCard',
+
     data(){
         return {
             inputBioUser: '',

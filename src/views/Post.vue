@@ -4,7 +4,11 @@
             <HeaderNav/>
         </nav>
 
-        <main class="post">
+        <div v-if="getUserIdFromVueX === 0">
+            <Loading/>
+        </div>
+
+        <main v-else class="post">
             <PublicationCard
                 v-bind:publicationId = getIdPublicationFromUrl()
             />
@@ -20,6 +24,7 @@ import { mapState } from 'vuex';
 
 import HeaderNav from '@/components/HeaderNav.vue';
 import PublicationCard from '../components/PublicationCard'
+import Loading from '@/components/Loading.vue';
 
 export default {
 
@@ -27,13 +32,8 @@ export default {
 
     components: {
         HeaderNav,
-        PublicationCard
-    },
-
-    data(){
-        return{
-            
-        }
+        PublicationCard,
+        Loading,
     },
 
     computed:{

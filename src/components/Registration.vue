@@ -138,7 +138,7 @@ export default {
                     this.inputPassword = '';
                     setTimeout(() => {
                         this.$store.dispatch('setMode', 'login');
-                    }, 1000);
+                    }, 500);
 
                 }
             } catch(err){

@@ -3,7 +3,12 @@
         <nav class="main-navbar">
             <HeaderNav/>
         </nav>
-        <main class="user">
+
+        <div v-if="getUserIdFromVueX === 0">
+            <Loading/>
+        </div>
+
+        <main v-else class="user">
             <SettingsUserCard/>
         </main>
     </div>
@@ -14,6 +19,7 @@ import { mapState } from 'vuex';
 
 import HeaderNav from '@/components/HeaderNav.vue';
 import SettingsUserCard from '@/components/SettingsUserCard.vue';
+import Loading from '@/components/Loading.vue';
 
 export default {
     name: 'User',
@@ -21,6 +27,7 @@ export default {
     components: {
         HeaderNav,
         SettingsUserCard,
+        Loading,
     },
 
     data(){
