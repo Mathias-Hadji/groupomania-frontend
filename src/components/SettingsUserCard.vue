@@ -191,11 +191,11 @@ export default {
                 const confirmMsgDeleteAccount = confirm('Attention, cette action est irreversible. Etes-vous sûr de vouloir supprimer votre compte ?');
 
                 if(confirmMsgDeleteAccount){
+                    await sessionService.deleteUserSession(this.getUserIdFromVueX, this.getUserTokenFromVueX);
+                    await userService.deleteOneUserAccount(this.getUserIdFromVueX, this.getUserTokenFromVueX);
                     window.localStorage.removeItem('groupomania_token');
                     window.localStorage.removeItem('groupomania_publicationsLiked');
                     window.location.href = '/';
-                    await userService.deleteOneUserAccount(this.getUserIdFromVueX, this.getUserTokenFromVueX);
-                    await sessionService.deleteUserSession(this.getUserIdFromVueX, this.getUserTokenFromVueX);
 
                 } else {
                     alert('Suppression de votre compte annulée.')

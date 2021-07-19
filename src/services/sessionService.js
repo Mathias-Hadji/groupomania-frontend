@@ -12,7 +12,7 @@ export default {
 
     setUserSession(userId, token){
         return axios.post(`${baseUrl}/session`, 
-            {userId: userId, token: token }, 
+            { userId: userId, token: token }, 
             { headers: { Authorization: `Bearer ${token}`} }
         );
     },
