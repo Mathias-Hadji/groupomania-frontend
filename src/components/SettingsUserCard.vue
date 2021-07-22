@@ -15,7 +15,7 @@
                     </div>
 
                     <label v-if="validBtnProfilePic == false" class="section-profile-pic__label" for="profilePic">Modifier</label>
-                    <input @change="previewImage" id="profilePic" class="section-profile-pic__input" type="file" name="profilePic">
+                    <input @change="previewImage" id="profilePic" class="section-profile-pic__input" type="file" accept=".jpg, .jpeg, .png" name="profilePic">
                     
                     <div v-if="validBtnProfilePic == true && cancelBtnProfilePic == true" class="btn-profile-pic">
                         <button @click="modifyProfilePic" class="btn-profile-pic__btn button-primary">Valider</button>
@@ -256,6 +256,7 @@ export default {
         margin-right: 20px;
         margin-top: 50px;
         margin-bottom: 50px;
+        flex-wrap: wrap;
 
         .username{
             display: flex;
@@ -274,7 +275,6 @@ export default {
 
             .section-profile-pic{
                 display: flex;
-                flex: auto;
                 align-items: center;
                 flex-direction: column;
                 text-align: left;
@@ -348,11 +348,11 @@ export default {
             }  
 
             .section-user-information{
+                width: 50%;
                 display: flex;
-                flex: auto;
+                flex-wrap: wrap;
                 flex-direction: column;
                 text-align: left;
-                padding: 0 20px;
                 
                 .user-information, .user-bio{
                     width: 100%;
@@ -365,6 +365,7 @@ export default {
                     }
 
                     &__content-bio{
+                        word-break: break-all;
                         margin-bottom: 20px;
                     }
                     
@@ -387,11 +388,7 @@ export default {
                         margin-bottom: 10px;
                         text-align: center;
                     }
-
-
                 }
-
-
             }
             
             .section-update-password{

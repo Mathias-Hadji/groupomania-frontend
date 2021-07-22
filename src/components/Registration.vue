@@ -136,9 +136,7 @@ export default {
                     this.inputLastName = '';
                     this.inputEmail = '';
                     this.inputPassword = '';
-                    setTimeout(() => {
-                        this.$store.dispatch('setMode', 'login');
-                    }, 500);
+
 
                 }
             } catch(err){

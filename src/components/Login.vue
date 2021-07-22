@@ -70,13 +70,13 @@ export default {
         async login(){
             try {
                 if(!this.getEmailRegExpFromVueX.test(this.inputEmail)){
-                    let e = new Error('Email non valide.');
+                    let e = new Error("L'adresse email et le mot de passe que vous avez entrés ne correspondent pas à ceux présents dans nos fichiers. Veuillez vérifier et réessayer.");
                     e.name = 'RegexpErrorEmail';
                     throw e;
                 }
 
                 if(!this.getPasswordRegExpFromVueX.test(this.inputPassword)){
-                    let e = new Error('Mot de passe non valide.');
+                    let e = new Error("L'adresse email et le mot de passe que vous avez entrés ne correspondent pas à ceux présents dans nos fichiers. Veuillez vérifier et réessayer.");
                     e.name = 'RegexpErrorPassword';
                     throw e;
                 }
@@ -94,15 +94,10 @@ export default {
                 if(err.name === 'RegexpErrorEmail' || err.name === 'RegexpErrorPassword'){
                     this.errorMsgLogin = err.message;
                     this.inputPassword = ''
-                    setTimeout(() => {
-                        this.errorMsgLogin = '';
-                    }, 3000);
+
                 } else {
                     this.errorMsgLogin = err.response.data;
                     this.inputPassword = ''
-                    setTimeout(() => {
-                        this.errorMsgLogin = null;
-                    }, 3000);
                 }
             }
         },

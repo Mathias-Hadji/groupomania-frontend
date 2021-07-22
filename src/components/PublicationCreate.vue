@@ -11,7 +11,7 @@
                 </div>
                 <div class="form-group">
                     <label for="inputUploadImg"><img class="form-group__icon icon" src="../assets/file-image-regular.svg"></label>
-                    <input @change="previewImage" id="inputUploadImg" class="form-group__file-upload" type="file" name="file" ref="fileInput">  
+                    <input @change="previewImage" id="inputUploadImg" class="form-group__file-upload" type="file" name="file" accept=".jpg, .jpeg, .png, .gif" ref="fileInput">  
                 </div>
                 <div class="row-btn">
                     <button v-bind:class="{'button--disabled' : !btnDisabled}" v-bind:disabled="!btnDisabled" class="button">Publier</button>

@@ -290,7 +290,7 @@ export default {
         background:white;
         border-radius: 16px;
         padding:20px;
-        margin: 15px 20px;
+        margin: 15px 20px 50px 20px;
 
         .main-container{
             width: 100%;
@@ -359,11 +359,15 @@ export default {
                         width: 100%;
 
                         .message-publication{
+                            display: flex;
                             width: 100%;
-                            margin: 15px 0;
+                            margin: 30px 0;
 
                             &__text{
+                                display: flex;
+                                width: 100%;
                                 font-size: 20px;
+                                word-break: break-all;
                             }
                         }
 
