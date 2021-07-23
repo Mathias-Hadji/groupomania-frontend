@@ -135,7 +135,7 @@ export default {
         }
 
         &__action {
-            color:#2196F3;
+            color:#004279;
             text-decoration: underline;
             cursor: pointer;
         } 
