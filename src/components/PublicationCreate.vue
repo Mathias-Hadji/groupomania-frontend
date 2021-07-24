@@ -2,19 +2,20 @@
     <section class="form-publication-container">
         <div class="card">
             <h2 class="card__title">Exprimez-vous :</h2>
-            <form class="form-publication" @submit.prevent="createNewPublication" enctype="multipart/form-data">
+            <form class="form-publication" @submit.prevent enctype="multipart/form-data">
                 <div v-if="imageTempUrl != null " @click="cancelPrevImage" class="div-image-preview">
                     <img :src="imageTempUrl" class="div-image-preview__image-preview" alt="Médias">       
                 </div>            
                 <div class="form-group">
-                    <textarea v-model="message" class="form-group__message-input" rows="5" maxlength="255" placeholder="Ajouter un texte ..."></textarea>
+                    <label for="message" class="form-group__label-message">Ajouter un texte ...</label>
+                    <textarea v-model="message" id="message" class="form-group__message-input" rows="5" maxlength="255" placeholder="Ajouter un texte ..."></textarea>
                 </div>
                 <div class="form-group">
-                    <label for="inputUploadImg"><img class="form-group__icon icon" src="../assets/file-image-regular.svg"></label>
+                    <label for="inputUploadImg"><img class="form-group__icon icon" src="../assets/file-image-regular.svg" alt="icone upload file"></label>
                     <input @change="previewImage" id="inputUploadImg" class="form-group__file-upload" type="file" name="file" accept=".jpg, .jpeg, .png, .gif" ref="fileInput">  
                 </div>
                 <div class="row-btn">
-                    <button v-bind:class="{'button--disabled' : !btnDisabled}" v-bind:disabled="!btnDisabled" class="button">Publier</button>
+                    <button @click="createNewPublication()" v-bind:class="{'button--disabled' : !btnDisabled}" v-bind:disabled="!btnDisabled" class="button">Publier</button>
                 </div>
             </form>
         </div>
@@ -153,6 +154,12 @@ export default {
             .form-group{
                 display: flex;
                 margin: 20px 0 20px 0;
+
+
+                &__label-message{
+                    display: none;
+                }
+
                 &__file-upload{
                     display: none;
                 }       

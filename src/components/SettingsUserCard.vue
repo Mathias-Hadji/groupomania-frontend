@@ -14,8 +14,11 @@
                         <img v-else class="container-profile-pic__pic" :src="imageTempUrl" alt="image de profil"> 
                     </div>
 
-                    <label v-if="validBtnProfilePic == false" class="section-profile-pic__label" for="profilePic">Modifier</label>
-                    <input @change="previewImage" id="profilePic" class="section-profile-pic__input" type="file" accept=".jpg, .jpeg, .png" name="profilePic">
+                    <form action="" class="form-profile-pic" @submit.prevent>
+                        <label v-if="validBtnProfilePic == false" class="button button-hover" for="profilePic">Modifier</label>
+                        <input @change="previewImage" id="profilePic" class="section-profile-pic__input" type="file" accept=".jpg, .jpeg, .png" name="profilePic">
+                    </form>
+
                     
                     <div v-if="validBtnProfilePic == true && cancelBtnProfilePic == true" class="btn-profile-pic">
                         <button @click="modifyProfilePic" class="btn-profile-pic__btn button-primary">Valider</button>
@@ -33,8 +36,12 @@
                     <div class="user-bio">
                         <h2 class="user-bio__title">Bio</h2>
                         <p class="user-bio__content-bio">{{ getBioUserFromVueX }}</p>
-                        <textarea v-model="inputBioUser" class="user-bio__message-input" rows="5" maxlength="255" placeholder="Ajouter un texte ..."></textarea>
-                        <button @click="modifyBioUser" class="button">Modifier ma bio</button>
+                        <form @submit.prevent action="">
+                            <label for="bio" class="user-bio__label-bio">Ajouter un texte ...</label>
+                            <textarea v-model="inputBioUser" id="bio" class="user-bio__message-input" rows="5" maxlength="255" placeholder="Ajouter un texte ..."></textarea>
+                            <button @click="modifyBioUser" class="button">Modifier ma bio</button>
+                        </form>
+
                         <span>Nombre de carctères restants: [{{ 255 - inputBioUser.length}}]</span>
                         <p v-if="successMsgInputBioUser != null" class="user-bio__success-message text-success">{{ successMsgInputBioUser }}</p> 
                         <p v-if="errorMsgInputBioUser != null" class="user-bio__success-message text-success">{{ errorMsgInputBioUser }}</p> 
@@ -46,17 +53,19 @@
             <section class="row">
                 <section class="section-update-password">
                     <h2 class="section-update-password__title">Modifier mon mot de passe</h2>
-                    <div class="update-password">
-                        <label class="update-password__label" for="current-password">Mot de passe actuel :</label>
-                        <input v-model="inputUserCurrentPassword" class="update-password__input" type="password" name="current-password" required>
-                    </div>
-                    <div class="update-password">
-                        <label class="update-password__label" for="new-password">Nouveau mot de passe :</label>
-                        <input v-model="inputUserNewPassword" class="update-password__input" type="password" name="new-password" required>
-                        <button @click="modifyPassword" v-bind:disabled="btnDisabled == true" v-bind:class="{'button--disabled' : btnDisabled}" class="button">Valider</button>
-                        <p v-if="errorMsgCurrentPassword != null" class="update-password__error-message text-danger">{{ errorMsgCurrentPassword }}</p>
-                        <p v-if="successMsgPassword != null" class="update-password__success-message text-success">{{ successMsgPassword }}</p>
-                    </div>
+                    <form action="" @submit.prevent>
+                        <div class="update-password">
+                            <label class="update-password__label" for="current-password">Mot de passe actuel :</label>
+                            <input v-model="inputUserCurrentPassword" id="current-password" class="update-password__input" type="password" required>
+                        </div>
+                        <div class="update-password">
+                            <label class="update-password__label" for="new-password">Nouveau mot de passe :</label>
+                            <input v-model="inputUserNewPassword" id="new-password" class="update-password__input" type="password" required>
+                            <button @click="modifyPassword" v-bind:disabled="btnDisabled == true" v-bind:class="{'button--disabled' : btnDisabled}" class="button">Valider</button>
+                            <p v-if="errorMsgCurrentPassword != null" class="update-password__error-message text-danger">{{ errorMsgCurrentPassword }}</p>
+                            <p v-if="successMsgPassword != null" class="update-password__success-message text-success">{{ successMsgPassword }}</p>
+                        </div>
+                    </form>
                 </section>
 
                 <section class="section-delete-account">
@@ -295,6 +304,10 @@ export default {
                         -moz-box-shadow: 3px 3px 5px 0px rgba(0,0,0,0.75);
                     }
                 }
+
+                .form-profile-pic{
+                    width: 100%;
+                }
                 
                 &__title{
                     display: flex;
@@ -359,6 +372,10 @@ export default {
                     display: flex;
                     flex-direction: column;
                     margin-bottom: 20px;
+
+                    &__label-bio{
+                        display: none;
+                    }
 
                     &__title{
                         margin-bottom: 10px;

@@ -3,19 +3,27 @@
         <div class="card">
             <h1 class="card__title"> S'inscrire</h1>
             <p class="card__subtitle">Vous avez déjà un compte ? <span class="card__action" @click=switchMode>Se connecter</span></p>
-            <div class="form-row">
-                <input @change="validFirstName()" v-model="inputFirstName" class="input" v-bind:class="{'error-input' : errorMsgFirstName, 'valid-input' : successMsgRegistration }" type="text" placeholder="Prénom"/>
-                <input @change="validLastName()" v-model="inputLastName" class="input" v-bind:class="{'error-input' : errorMsgLastName, 'valid-input' : successMsgRegistration }" type="text" placeholder="Nom"/>
-            </div>        
-            <div class="form-row">
-                <input @change="validEmail()" v-model="inputEmail" class="input" v-bind:class="{'error-input' : errorMsgEmail, 'valid-input' : successMsgRegistration }" type="email" placeholder="Adresse mail"/>
-            </div>
-            <div class="form-row">
-                <input @change="validPassword()" v-model="inputPassword" class="input" v-bind:class="{'error-input' : errorMsgPassword, 'valid-input' : successMsgRegistration }" type="password" placeholder="Mot de passe"/>
-            </div>
-            <div class="form-row">
-                <button @click="createUserAccount()" class="button" v-bind:class="{'button--disabled' : !btnDisabled}" v-bind:disabled="!btnDisabled" type=submit>Créer un compte</button>
-            </div>
+            
+            <form action="" @submit.prevent>
+                <div class="form-row">
+                    <label for="firstName" class="form-row__label-first-name">Prénom</label>
+                    <input @change="validFirstName()" v-model="inputFirstName" id="firstName" class="input" v-bind:class="{'error-input' : errorMsgFirstName, 'valid-input' : successMsgRegistration }" type="text" placeholder="Prénom" required/>
+
+                    <label for="lastName" class="form-row__label-last-name">Nom</label> 
+                    <input @change="validLastName()" v-model="inputLastName" id="lastName" class="input" v-bind:class="{'error-input' : errorMsgLastName, 'valid-input' : successMsgRegistration }" type="text" placeholder="Nom" required/>
+                </div>        
+                <div class="form-row">
+                    <label for="email" class="form-row__label-email">Adresse Email</label> 
+                    <input @change="validEmail()" v-model="inputEmail" id="email" class="input" v-bind:class="{'error-input' : errorMsgEmail, 'valid-input' : successMsgRegistration }" type="email" placeholder="Adresse mail" required/>
+                </div>
+                <div class="form-row">
+                    <label for="password" class="form-row__label-password">Mot de passe</label> 
+                    <input @change="validPassword()" v-model="inputPassword" id="password" class="input" v-bind:class="{'error-input' : errorMsgPassword, 'valid-input' : successMsgRegistration }" type="password" placeholder="Mot de passe" required/>
+                </div>
+                <div class="form-row">
+                    <button @click="createUserAccount()" class="button" v-bind:class="{'button--disabled' : !btnDisabled}" v-bind:disabled="!btnDisabled" type=submit>Créer un compte</button>
+                </div>
+            </form>
 
             <div>
                 <p v-if="successMsgRegistration != null" class="text-success">{{ successMsgRegistration }}</p>
@@ -186,7 +194,7 @@ export default {
         }
 
         &__action {
-            color:#2196F3;
+            color:#175e97;
             text-decoration: underline;
             cursor: pointer;
         } 
@@ -196,6 +204,10 @@ export default {
             margin: 16px 0px;
             gap: 16px;
             flex-wrap: wrap;
+
+            &__label-first-name, &__label-last-name, &__label-email, &__label-password{
+                display: none;
+            }
 
             &__input{
                 padding: 8px;

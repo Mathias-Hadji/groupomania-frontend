@@ -58,7 +58,10 @@ export default {
 }
 
 .button {
-    background: #2196F3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #1b78c5;
     color:white;
     border-radius: 8px;
     font-weight: 800;
@@ -67,10 +70,11 @@ export default {
     width: 100%;
     padding: 16px;
     transition: .4s background-color;
+    text-align: center;
 }
 .button:hover {
     cursor:pointer;
-    background: #1976D2;
+    background: #135faa;
 }
 .button-primary{
     background: #2196F3;

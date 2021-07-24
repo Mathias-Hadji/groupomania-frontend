@@ -67,10 +67,11 @@
                         <img class="profile-pic-user__img" :src="getProfilePicUserFromVueX" alt="image de profil">
                     </div>
                     <div class="add-new-comment">
-                        <textarea v-model="addNewComment" class="add-new-comment__input" placeholder="Ecrivez un commentaire..."></textarea>
+                        <label :for="publicationData.id" class="add-new-comment__label-add-comment">Ajouter un texte ...</label>
+                        <textarea v-model="addNewComment" :id="publicationData.id" class="add-new-comment__input" placeholder="Ecrivez un commentaire..."></textarea>
                         <span>
                             <button v-bind:class="{'button--disabled' : !btnDisabled}" v-bind:disabled="!btnDisabled" @click="publishNewComment(publicationId)" class="button">Publier</button>
-                        </span> 
+                        </span>
                     </div>
                 </div>
 
@@ -516,6 +517,10 @@ export default {
                     width: 100%;
                     display: flex;
                     align-items: center;
+
+                    &__label-add-comment{
+                        display: none;
+                    }
 
                     &__input{
                         width: 100%;

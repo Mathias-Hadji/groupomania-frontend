@@ -4,15 +4,20 @@
             <h1 class="card__title"> Se connecter</h1>
             <p class="card__subtitle">Vous n'avez pas encore de compte ? <span class="card__action" @click=switchMode>Créer un compte</span></p>
 
-            <div class="form-row">
-                <input v-model="inputEmail" class="form-row__input" type="email" placeholder="Adresse mail"/>
-            </div>
-            <div class="form-row">
-                <input v-model="inputPassword" class="form-row__input" type="password" placeholder="Mot de passe"/>
-            </div>
-            <div class="form-row">
-                <button @click="login()" class="button" v-bind:class="{'button--disabled' : !btnDisabled}" v-bind:disabled="!btnDisabled" type="submit">Se connecter</button>
-            </div>
+            <form action="" @submit.prevent>
+                <div class="form-row">
+                    <label class="form-row__label-email" for="email">Adresse mail</label>
+                    <input v-model="inputEmail" class="form-row__input" type="email" id="email" placeholder="Adresse mail" required/>
+                </div>
+                <div class="form-row">
+                    <label class="form-row__label-password" for="password">Mot de passe</label>
+                    <input v-model="inputPassword" class="form-row__input" type="password" id="password" placeholder="Mot de passe" required/>
+                </div>
+                <div class="form-row">
+                    <button @click="login()" class="button" v-bind:class="{'button--disabled' : !btnDisabled}" v-bind:disabled="!btnDisabled" type="submit">Se connecter</button>
+                </div>
+            </form>
+
 
             <div>
                 <p v-if="successMsgLogin != null" class="text-success">{{ successMsgLogin }}</p> 
@@ -135,7 +140,7 @@ export default {
         }
 
         &__action {
-            color:#004279;
+            color:#175e97;
             text-decoration: underline;
             cursor: pointer;
         } 
@@ -145,6 +150,10 @@ export default {
             margin: 16px 0px;
             gap: 16px;
             flex-wrap: wrap;
+
+            &__label-email, &__label-password{
+                display: none;
+            }
 
             &__input{
                 padding: 8px;
