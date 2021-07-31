@@ -22,3 +22,6 @@ npm run lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+
+
+URL du repository backend de l'application : https://github.com/Mathias-Hadji/groupomania-backend
